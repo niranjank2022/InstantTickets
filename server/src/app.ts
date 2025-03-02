@@ -7,6 +7,9 @@ import http from "http";
 import { config } from "./config/config";
 import { messages } from "./config/logger";
 import { initializeSocket } from "./socket/socket";
+import bookingsRouter from "./routes/bookings.routes";
+import showsRouter from "./routes/shows.routes";
+import venuesRouter from "./routes/venues.routes";
 
 // Connect to the database
 mongoose
@@ -16,6 +19,11 @@ mongoose
 
 // Create the express app
 const app: Application = express();
+
+// Mount the API routes
+app.use("/apis/bookings/", bookingsRouter);
+app.use("/apis/shows/", showsRouter);
+app.use("/apis/venues/", venuesRouter);
 
 // Add middlewares to the app
 app.use(cors());
