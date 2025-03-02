@@ -14,9 +14,9 @@ export function initializeSocket(server: HttpServer) {
 
     io.on("connection", (socket) => {
         console.log(`New socket client connected: ${socket.id}`);
-        socket.on("selectSeat", selectSeatController);
-        socket.on("releaseSeat", releaseSeatController);
-        socket.on("confirmSeat", confirmSeatController);
+        socket.on("selectSeat", (data) => selectSeatController(socket, data));
+        socket.on("releaseSeat", (data) => releaseSeatController(socket, data));
+        socket.on("confirmSeat", (data) => confirmSeatController(socket, data));
         socket.on("disconnect", () => console.log(`Client disconnected: ${socket.id}`));
     });
 
