@@ -1,5 +1,5 @@
-import app from "./app";
+import { app, httpServer } from "./app";
 import { config } from "./config/config";
 import { messages } from "./config/logger";
 
-app.listen(config.PORT, () => console.log(messages.serverRunning));
+httpServer.listen(config.PORT, () => console.log(messages.SERVER_RUNNING));

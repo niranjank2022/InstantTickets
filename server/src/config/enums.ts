@@ -3,3 +3,8 @@ export enum SeatStatus {
     Available = "AVAILABLE",    // Ticket is available for booking
     Reserved = "RESERVED",        // Ticket has been reserved for booking
 }
+
+export enum SocketStatus {
+    Success = "SUCCESS",
+    Failure = "FAILURE",
+}
