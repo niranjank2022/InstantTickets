@@ -27,6 +27,7 @@ const showSeatSchema = new Schema<IShowSeat>({
         type: String,
         enum: Object.values(SeatStatus),
         default: SeatStatus.Available,
+        required: true,
     },
     expirationTime: {
         type: Date || null,
