@@ -24,7 +24,7 @@ app.use("/apis/venues/", venuesRouter);
 
 // Connect to the database
 mongoose
-  .connect(config.MONGODB_URI)
+  .connect(config.MONGODB_URI!)
   .then(() => console.log(messages.MONGODB_CONNECTION_SUCCESS))
   .catch((err) => console.log(messages.MONGODB_CONNECTION_FAILURE, err));
 
@@ -40,5 +40,3 @@ app.use((req, res, next) => {
 httpServer.listen(config.PORT, () => {
   console.log(messages.SERVER_RUNNING);
 });
-
-export { app, httpServer };

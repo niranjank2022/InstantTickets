@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
-import { Show, ISeat } from "../src/models/show.model";
-import { config } from "../src/config/config";
-import { SeatStatus } from "../src/config/enum";
+import "dotenv/config";
+import { Show, ISeat } from "../models/show.model";
+import { config } from "../config/config";
+import { SeatStatus } from "../config/enum";
 
 
-export const seedShows = async () => {
+export async function seedShows() {
     try {
-        await mongoose.connect(config.MONGODB_URI);
+        await mongoose.connect(config.MONGODB_URI!);
         console.log("Connected to MongoDB");
 
         // Clear existing shows
@@ -47,16 +48,15 @@ export const seedShows = async () => {
         // Insert new shows
         await Show.insertMany(shows);
         console.log("Shows and seats seeded successfully!");
-
         mongoose.connection.close();
-        
+
     } catch (error) {
         console.error("Error seeding shows:", error);
         mongoose.connection.close();
     }
 };
 
-const generateSeats = (sections: { x: number; y: number; rows: number; columns: number; }[]) => {
+function generateSeats(sections: { x: number; y: number; rows: number; columns: number; }[]) {
     const seats: ISeat[] = [];
     for (const { x, y, rows, columns } of sections) {
         for (let i = 0; i < rows; i++) {
@@ -72,5 +72,3 @@ const generateSeats = (sections: { x: number; y: number; rows: number; columns: 
 
     return seats;
 };
-
-seedShows();
