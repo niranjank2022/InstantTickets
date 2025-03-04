@@ -34,7 +34,7 @@ initializeSocket(httpServer);
 
 // Error handling middleware (optional but recommended)
 app.use((req, res, next) => {
-  res.status(404).send("Sorry, that route doesn't exist.");
+  res.status(404).send(messages.ROUTE_NOT_FOUND);
 });
 
 httpServer.listen(config.PORT, () => {

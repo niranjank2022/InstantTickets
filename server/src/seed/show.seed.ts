@@ -3,16 +3,17 @@ import "dotenv/config";
 import { Show, ISeat } from "../models/show.model";
 import { config } from "../config/config";
 import { SeatStatus } from "../config/enum";
+import { messages, logError } from "../config/logger";
 
 
 export async function seedShows() {
     try {
         await mongoose.connect(config.MONGODB_URI!);
-        console.log("Connected to MongoDB");
+        console.log(messages.MONGODB_CONNECTION_SUCCESS);
 
         // Clear existing shows
         await Show.deleteMany({});
-        console.log("Cleared existing shows");
+        console.log(messages.CLEARED_RECORDS("Shows"));
 
         const sections = [
             [
@@ -47,11 +48,15 @@ export async function seedShows() {
 
         // Insert new shows
         await Show.insertMany(shows);
-        console.log("Shows and seats seeded successfully!");
+        console.log(messages.SEED_SUCCESS("Shows"));
         mongoose.connection.close();
 
     } catch (error) {
-        console.error("Error seeding shows:", error);
+        if (error instanceof Error) {
+            logError(error);
+        } else {
+            console.error(messages.UNKNOWN_ERROR);
+        }
         mongoose.connection.close();
     }
 };

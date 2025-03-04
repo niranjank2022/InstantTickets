@@ -3,10 +3,10 @@ import { Socket } from "socket.io";
 import { getIo } from "./socket";
 import { Show } from "../models/show.model";
 import { SeatStatus, SocketStatus } from "../config/enum";
-import { messages } from "../config/logger";
+import { logError, messages } from "../config/logger";
 
 
-export async function selectSeatController(socket: Socket, data: { showId: String, x: Number, y: Number }) {
+export async function selectSeatController(socket: Socket, data: { showId: string, x: number, y: number }) {
     try {
         const { showId, x, y } = data;
         const show = await Show.findById(showId);
@@ -14,7 +14,7 @@ export async function selectSeatController(socket: Socket, data: { showId: Strin
             console.error(messages.RECORD_NOT_FOUND);
             return socket.emit("seatResponse", {
                 status: SocketStatus.Failure,
-                message: "Show not found!"
+                message: messages.RECORD_NOT_FOUND,
             });
         }
 
@@ -23,14 +23,14 @@ export async function selectSeatController(socket: Socket, data: { showId: Strin
             console.error(messages.RECORD_NOT_FOUND);
             return socket.emit("seatResponse", {
                 status: SocketStatus.Failure,
-                message: "Seat not found!"
+                message: messages.SEAT_NOT_FOUND,
             });
         }
 
         if (seat.status == SeatStatus.Reserved) {
             return socket.emit("seatResponse", {
                 status: SocketStatus.Failure,
-                message: "Seat already reserved!"
+                message: messages.SEAT_ALREADY_RESERVED,
             });
         }
 
@@ -38,16 +38,15 @@ export async function selectSeatController(socket: Socket, data: { showId: Strin
         show?.save();
         socket.emit("seatResponse", {
             status: SocketStatus.Success,
-            message: "Seat has been reserved!"
+            message: messages.SEAT_RESERVED_NOW,
         });
         getIo().emit("seatUpdate", { ...data, seatStatus: seat.status });
 
     } catch (error) {
         if (error instanceof Error) {
-            console.error("Error message: ", error.message);
-            console.error("Error Stack Trace: ", error.stack);
+            logError(error);
         } else {
-            console.error("Unknown error");
+            console.error(messages.UNKNOWN_ERROR);
         }
     }
 }
@@ -60,7 +59,7 @@ export async function releaseSeatController(socket: Socket, data: { showId: Stri
             console.error(messages.RECORD_NOT_FOUND);
             return socket.emit("seatResponse", {
                 status: SocketStatus.Failure,
-                message: "Show not found!"
+                message: messages.RECORD_NOT_FOUND,
             });
         }
 
@@ -69,7 +68,7 @@ export async function releaseSeatController(socket: Socket, data: { showId: Stri
             console.error(messages.RECORD_NOT_FOUND);
             return socket.emit("seatResponse", {
                 status: SocketStatus.Failure,
-                message: "Seat not found!"
+                message: messages.SEAT_NOT_FOUND,
             });
         }
 
@@ -77,16 +76,15 @@ export async function releaseSeatController(socket: Socket, data: { showId: Stri
         show?.save();
         socket.emit("seatResponse", {
             status: SocketStatus.Success,
-            message: "Seat has been released!"
+            message: messages.SEAT_RESERVED_NOW,
         });
         getIo().emit("seatUpdate", { ...data, seatStatus: seat.status });
 
     } catch (error) {
         if (error instanceof Error) {
-            console.error("Error message: ", error.message);
-            console.error("Error Stack Trace: ", error.stack);
+            logError(error);
         } else {
-            console.error("Unknown error");
+            console.error(messages.UNKNOWN_ERROR);
         }
     }
 }
@@ -99,7 +97,7 @@ export async function confirmSeatController(socket: Socket, data: { showId: Stri
             console.error(messages.RECORD_NOT_FOUND);
             return socket.emit("seatResponse", {
                 status: SocketStatus.Failure,
-                message: "Show not found!"
+                message: messages.RECORD_NOT_FOUND,
             });
         }
 
@@ -108,14 +106,14 @@ export async function confirmSeatController(socket: Socket, data: { showId: Stri
             console.error(messages.RECORD_NOT_FOUND);
             return socket.emit("seatResponse", {
                 status: SocketStatus.Failure,
-                message: "Seat not found!"
+                message: messages.SEAT_NOT_FOUND,
             });
         }
 
         if (seat.status !== SeatStatus.Reserved) {
             return socket.emit("seatResponse", {
                 status: SocketStatus.Failure,
-                message: "Seat already booked. Can't book this seat!"
+                message: messages.SEAT_CANNOT_BOOK,
             });
         }
 
@@ -123,16 +121,15 @@ export async function confirmSeatController(socket: Socket, data: { showId: Stri
         show?.save();
         socket.emit("seatResponse", {
             status: SocketStatus.Success,
-            message: "Seat has been booked!"
+            message: messages.SEAT_BOOKED_NOW,
         });
         getIo().emit("seatUpdate", { ...data, seatStatus: seat.status });
 
     } catch (error) {
         if (error instanceof Error) {
-            console.error("Error message: ", error.message);
-            console.error("Error Stack Trace: ", error.stack);
+            logError(error);
         } else {
-            console.error("Unknown error");
+            console.error(messages.UNKNOWN_ERROR);
         }
     }
 }

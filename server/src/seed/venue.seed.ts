@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import "dotenv/config";
 import { Venue } from "../models/venue.model";
 import { config } from "../config/config";
+import { logError, messages } from "../config/logger";
 
 
 // Sample Venues with Sections
@@ -37,19 +38,23 @@ export const venues = [
 export async function seedVenues() {
 	try {
 		await mongoose.connect(config.MONGODB_URI!);
-		console.log("Connected to MongoDB");
+		console.log(messages.MONGODB_CONNECTION_SUCCESS);
 
 		// Clear existing venues
 		await Venue.deleteMany({});
-		console.log("Cleared existing venues");
+		console.log(messages.CLEARED_RECORDS("Venues"));
 
 		// Insert new venues
 		await Venue.insertMany(venues);
-		console.log("Venues seeded successfully!");
+		console.log(messages.SEED_SUCCESS("Venues"));
 		mongoose.connection.close();
 
 	} catch (error) {
-		console.error("Error seeding venues:", error);
+		if (error instanceof Error) {
+			logError(error);
+		} else {
+			console.error(messages.UNKNOWN_ERROR);
+		}
 		mongoose.connection.close();
 	}
 };

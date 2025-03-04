@@ -1,13 +1,14 @@
+import { messages } from "../config/logger";
 import { seedBookings } from "./booking.seed";
 import { seedShows } from "./show.seed";
 import { seedVenues } from "./venue.seed";
 
 async function runAllSeeds() {
-    console.log("Running all seed scripts...");
+    console.log(messages.SEEDS_RUNNING);
     await seedShows();
     await seedVenues();
     await seedBookings();
-    console.log("All seeds completed!");
+    console.log(messages.SEEDS_COMPLETED);
 };
 
 (async () => {

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Venue } from "../models/venue.model";
-import { messages } from "../config/logger";
+import { logError, messages } from "../config/logger";
 
 
 export async function getVenueById(req: Request, res: Response) {
@@ -28,12 +28,11 @@ export async function getVenueById(req: Request, res: Response) {
 
     } catch (error) {
         if (error instanceof Error) {
-            console.error("Error message: ", error.message);
-            console.error("Error Stack Trace: ", error.stack);
+            logError(error);
         } else {
-            console.error("Unknown error");
+            console.error(messages.UNKNOWN_ERROR);
         }
-        
+
         res.status(500).json({
             message: messages.SERVER_ERROR,
         });
