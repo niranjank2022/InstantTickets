@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 interface ISection {
   name: string;
@@ -82,4 +82,4 @@ const venueSchema = new Schema<IVenue>({
   },
 });
 
-export const Venue = mongoose.model<IVenue>('Venue', venueSchema);
+export const Venue: Model<IVenue> = mongoose.model<IVenue>('Venue', venueSchema);

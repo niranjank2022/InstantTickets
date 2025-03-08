@@ -8,19 +8,19 @@ export async function getShowById(req: Request, res: Response) {
     const show = await Show.findById(showId);
 
     if (show === undefined) {
-      res.status(400).json({
+      res.status(404).json({
         message: messages.RECORD_NOT_FOUND,
       });
       return;
     }
 
     res.status(200).json({
-      showId: show?._id,
-      venueId: show?.venueId,
-      name: show?.name,
-      startTime: show?.startTime,
-      endTime: show?.endTime,
-      seats: show?.seats,
+      showId: show!._id,
+      venueId: show!.venueId,
+      name: show!.name,
+      startTime: show!.startTime,
+      endTime: show!.endTime,
+      seats: show!.seats,
     });
   } catch (error) {
     if (error instanceof Error) {

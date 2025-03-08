@@ -14,7 +14,7 @@ export async function createBooking(req: Request, res: Response) {
     });
 
     await booking.save();
-    res.status(200).json({
+    res.status(201).json({
       bookingId: booking._id,
       bookingTime: booking.bookingTime,
     });

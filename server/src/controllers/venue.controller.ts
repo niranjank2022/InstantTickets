@@ -8,21 +8,21 @@ export async function getVenueById(req: Request, res: Response) {
     const venue = await Venue.findById(venueId);
 
     if (venue === undefined) {
-      res.status(400).json({
+      res.status(404).json({
         message: messages.RECORD_NOT_FOUND,
       });
       return;
     }
 
     res.status(200).json({
-      venueId: venue?._id,
-      name: venue?.name,
-      location: venue?.location,
-      rows: venue?.rows,
-      cols: venue?.columns,
-      rowIndices: venue?.rowIndices,
-      columnIndices: venue?.columnIndices,
-      sections: venue?.sections,
+      venueId: venue!._id,
+      name: venue!.name,
+      location: venue!.location,
+      rows: venue!.rows,
+      columns: venue!.columns,
+      rowIndices: venue!.rowIndices,
+      columnIndices: venue!.columnIndices,
+      sections: venue!.sections,
     });
   } catch (error) {
     if (error instanceof Error) {

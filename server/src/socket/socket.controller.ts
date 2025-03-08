@@ -17,7 +17,7 @@ export async function selectSeatController(socket: Socket, data: { showId: strin
       });
     }
 
-    const seat = show?.seats.find(seat => seat.x === x && seat.y === y);
+    const seat = show.seats.find(seat => seat.x === x && seat.y === y);
     if (seat === undefined) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {
@@ -26,7 +26,7 @@ export async function selectSeatController(socket: Socket, data: { showId: strin
       });
     }
 
-    if (seat.status == SeatStatus.Reserved) {
+    if (seat.status === SeatStatus.Reserved) {
       return socket.emit('seatResponse', {
         status: SocketStatus.Failure,
         message: messages.SEAT_ALREADY_RESERVED,
@@ -34,7 +34,7 @@ export async function selectSeatController(socket: Socket, data: { showId: strin
     }
 
     seat.status = SeatStatus.Reserved;
-    show?.save();
+    show.save();
     socket.emit('seatResponse', {
       status: SocketStatus.Success,
       message: messages.SEAT_RESERVED_NOW,
@@ -61,7 +61,7 @@ export async function releaseSeatController(socket: Socket, data: { showId: stri
       });
     }
 
-    const seat = show?.seats.find(seat => seat.x === x && seat.y === y);
+    const seat = show.seats.find(seat => seat.x === x && seat.y === y);
     if (seat === undefined) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {
@@ -71,7 +71,7 @@ export async function releaseSeatController(socket: Socket, data: { showId: stri
     }
 
     seat.status = SeatStatus.Available;
-    show?.save();
+    show.save();
     socket.emit('seatResponse', {
       status: SocketStatus.Success,
       message: messages.SEAT_RESERVED_NOW,
@@ -98,7 +98,7 @@ export async function confirmSeatController(socket: Socket, data: { showId: stri
       });
     }
 
-    const seat = show?.seats.find(seat => seat.x === x && seat.y === y);
+    const seat = show.seats.find(seat => seat.x === x && seat.y === y);
     if (seat === undefined) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {
@@ -115,7 +115,7 @@ export async function confirmSeatController(socket: Socket, data: { showId: stri
     }
 
     seat.status = SeatStatus.Booked;
-    show?.save();
+    show.save();
     socket.emit('seatResponse', {
       status: SocketStatus.Success,
       message: messages.SEAT_BOOKED_NOW,

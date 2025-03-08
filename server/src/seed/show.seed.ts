@@ -68,6 +68,7 @@ function generateSeats(sections: { x: number; y: number; rows: number; columns: 
           x: x + i,
           y: y + j,
           status: SeatStatus.Available,
+          expirationTime: null,
         });
       }
     }

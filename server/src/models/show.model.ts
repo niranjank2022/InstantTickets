@@ -1,14 +1,14 @@
-import mongoose, { Schema, Model } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 import { SeatStatus } from '../config/enum';
 
 export interface ISeat {
   x: number;
   y: number;
   status: SeatStatus;
-  expirationTime?: Date;
+  expirationTime: Date | null;
 }
 
-interface IShow extends Document {
+export interface IShow extends Document {
   venueId: string;
   name: string;
   startTime: Date;
