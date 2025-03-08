@@ -5,6 +5,7 @@ import { messages } from './config/logger';
 import bookingsRouter from './routes/booking.route';
 import showsRouter from './routes/show.route';
 import venuesRouter from './routes/venue.route';
+import { startSeatCleanupJob } from './socket/seatCleanup.job';
 
 // Create the express app
 const app: Application = express();
@@ -22,5 +23,7 @@ app.use('/apis/venues/', venuesRouter);
 app.use((req, res) => {
   res.status(404).json({ message: messages.ROUTE_NOT_FOUND });
 });
+
+startSeatCleanupJob();
 
 export default app;

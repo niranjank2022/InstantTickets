@@ -20,6 +20,7 @@ export const messages = Object.freeze({
   CLIENT_CONNECTED: (sockedId: string) => `New socket client connected: ${sockedId}`,
   CLIENT_DISCONNECTED: (sockedId: string) => `New socket client disconnected: ${sockedId}`,
   SOCKET_INIT_ERROR: 'Error: Socket.io is not initialized.',
+  SEAT_CLEANUP_STARTED: 'Seats are being checked for timeout of reservation expiry time...',
 });
 
 export function logError(error: Error) {

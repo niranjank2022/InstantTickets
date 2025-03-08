@@ -27,6 +27,7 @@
     "http": "^0.0.1-security",
     "mongodb": "^6.13.1",
     "mongoose": "^8.10.1",
+    "node-cron": "^3.0.3",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "@types/mongodb": "^4.0.6",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^22.13.5",
+    "@types/node-cron": "^3.0.11",
     "@types/nodemon": "^1.19.6",
     "@types/socket.io": "^3.0.1",
     "@types/socket.io-client": "^1.4.36",
