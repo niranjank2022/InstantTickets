@@ -13,7 +13,6 @@ export async function createBooking(req: Request, res: Response) {
       bookedSeats: seats,
     });
 
-    await booking.save();
     res.status(201).json({
       bookingId: booking._id,
       bookingTime: booking.bookingTime,
