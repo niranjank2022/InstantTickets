@@ -1,6 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import { Request, Response, NextFunction } from 'express';
+import { messages } from '../config/logger';
 
 export function validateRequest<T extends object>(dtoClass: new () => T) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -9,7 +10,7 @@ export function validateRequest<T extends object>(dtoClass: new () => T) {
 
     if (errors.length > 0) {
       res.status(400).json({
-        message: 'Validation failed',
+        message: messages.VALIDATION_ERROR,
         errors: errors.map(err => ({
           property: err.property,
           constraints: err.constraints,

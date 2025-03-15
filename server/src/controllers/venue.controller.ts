@@ -4,10 +4,10 @@ import { logError, messages } from '../config/logger';
 
 export async function getVenueById(req: Request, res: Response) {
   try {
-    const venueId = req.params.venueId;
+    const venueId = req.params.venueId.trim();
     const venue = await Venue.findById(venueId);
 
-    if (venue === undefined) {
+    if (!venue) {
       res.status(404).json({
         message: messages.RECORD_NOT_FOUND,
       });

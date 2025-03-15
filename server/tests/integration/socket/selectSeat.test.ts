@@ -19,7 +19,6 @@ describe('selectSeatController', () => {
   });
 
   beforeEach(() => {
-    // Mock socket.emit()
     mockSocket = {
       emit: jest.fn(),
     } as Partial<ServerSocket>;

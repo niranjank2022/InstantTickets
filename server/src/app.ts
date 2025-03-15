@@ -19,7 +19,7 @@ app.use('/apis/bookings/', bookingsRouter);
 app.use('/apis/shows/', showsRouter);
 app.use('/apis/venues/', venuesRouter);
 
-// Error handling middleware (optional but recommended)
+// Error handling middleware
 app.use((req, res) => {
   res.status(404).json({ message: messages.ROUTE_NOT_FOUND });
 });

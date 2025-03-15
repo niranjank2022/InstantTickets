@@ -4,10 +4,10 @@ import { logError, messages } from '../config/logger';
 
 export async function getShowById(req: Request, res: Response) {
   try {
-    const showId = req.params.showId;
+    const showId = req.params.showId.trim();
     const show = await Show.findById(showId);
 
-    if (show === undefined) {
+    if (!show) {
       res.status(404).json({
         message: messages.RECORD_NOT_FOUND,
       });

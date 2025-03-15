@@ -12,7 +12,6 @@ describe('startSeatCleanupJob', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // ✅ Mock getIo to return an object with an `emit` function
     (getIo as jest.Mock).mockReturnValue({
       emit: jest.fn(),
     });
@@ -22,8 +21,8 @@ describe('startSeatCleanupJob', () => {
     const mockShow = {
       _id: 'show123',
       seats: [
-        { x: 1, y: 1, status: SeatStatus.Reserved, expirationTime: new Date(Date.now() - 60000) }, // Expired
-        { x: 1, y: 2, status: SeatStatus.Available, expirationTime: null }, // Already available
+        { x: 1, y: 1, status: SeatStatus.Reserved, expirationTime: new Date(Date.now() - 60000) },
+        { x: 1, y: 2, status: SeatStatus.Available, expirationTime: null },
       ],
       save: jest.fn(),
     };
@@ -32,18 +31,12 @@ describe('startSeatCleanupJob', () => {
 
     startSeatCleanupJob();
 
-    // Simulate cron execution
     const cronCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
     await cronCallback();
 
-    // ✅ Expect expired seat to be reset to Available
     expect(mockShow.seats[0].status).toBe(SeatStatus.Available);
     expect(mockShow.seats[0].expirationTime).toBeNull();
-
-    // ✅ Ensure database save is called
     expect(mockShow.save).toHaveBeenCalled();
-
-    // ✅ Ensure socket event is emitted
     expect(getIo().emit).toHaveBeenCalledWith('seatUpdate', {
       x: 1,
       y: 1,
@@ -55,9 +48,7 @@ describe('startSeatCleanupJob', () => {
   test('should not modify non-expired seats', async () => {
     const mockShow = {
       _id: 'show456',
-      seats: [
-        { x: 2, y: 2, status: SeatStatus.Reserved, expirationTime: new Date(Date.now() + 60000) }, // Not expired yet
-      ],
+      seats: [{ x: 2, y: 2, status: SeatStatus.Reserved, expirationTime: new Date(Date.now() + 60000) }],
       save: jest.fn(),
     };
 
@@ -73,7 +64,7 @@ describe('startSeatCleanupJob', () => {
   });
 
   test('should handle no expired seats gracefully', async () => {
-    (Show.find as jest.Mock).mockResolvedValue([]); // No expired shows found
+    (Show.find as jest.Mock).mockResolvedValue([]);
 
     startSeatCleanupJob();
 
@@ -84,14 +75,16 @@ describe('startSeatCleanupJob', () => {
   });
 
   test('should handle errors without crashing', async () => {
-    // Mock database failure
+    let cronCallback;
     (Show.find as jest.Mock).mockRejectedValue(new Error('DB Error'));
-
     startSeatCleanupJob();
+    cronCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
+    await expect(cronCallback()).resolves.not.toThrow();
 
-    const cronCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
-
-    await expect(cronCallback()).resolves.not.toThrow(); // ✅ This should now pass
+    (Show.find as jest.Mock).mockRejectedValue({ message: 'error has occurred' });
+    startSeatCleanupJob();
+    cronCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
+    await expect(cronCallback()).resolves.not.toThrow();
   });
 
   test('should schedule cron job correctly', () => {

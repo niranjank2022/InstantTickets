@@ -19,7 +19,6 @@ describe('confirmSeatController', () => {
   });
 
   beforeEach(() => {
-    // Mock socket.emit()
     mockSocket = {
       emit: jest.fn(),
     } as Partial<ServerSocket>;
@@ -46,7 +45,6 @@ describe('confirmSeatController', () => {
       message: messages.SEAT_BOOKED_NOW,
     });
 
-    // Check if the seat status was updated to Booked
     expect((await Show.findById(showId))!.seats[0].status).toBe(SeatStatus.Booked);
   });
 

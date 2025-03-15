@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { Show } from '../models/show.model';
 import { getIo } from '../socket/socket';
-import { messages } from '../config/logger';
+import { logError, messages } from '../config/logger';
 import { SeatStatus } from '../config/enum';
 
 export function startSeatCleanupJob() {
@@ -28,7 +28,12 @@ export function startSeatCleanupJob() {
         }
       }
     } catch (error) {
-      console.error('Error in seat cleanup job:', error);
+      console.error(messages.SEAT_CLEANUP_ERROR);
+      if (error instanceof Error) {
+        logError(error);
+      } else {
+        console.error(messages.UNKNOWN_ERROR);
+      }
     }
   });
 }

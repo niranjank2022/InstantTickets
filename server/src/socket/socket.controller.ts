@@ -34,12 +34,13 @@ export async function selectSeatController(socket: Socket, data: { showId: strin
     }
 
     seat.status = SeatStatus.Reserved;
+    seat.expirationTime = new Date(Date.now() + 3 * 60 * 1000);
     show.save();
     socket.emit('seatResponse', {
       status: SocketStatus.Success,
       message: messages.SEAT_RESERVED_NOW,
     });
-    getIo().emit('seatUpdate', { ...data, seatStatus: seat.status });
+    getIo()!.emit('seatUpdate', { ...data, seatStatus: seat.status });
   } catch (error) {
     if (error instanceof Error) {
       logError(error);
@@ -62,7 +63,7 @@ export async function releaseSeatController(socket: Socket, data: { showId: stri
     }
 
     const seat = show.seats.find(seat => seat.x === x && seat.y === y);
-    if (seat === undefined) {
+    if (!seat) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {
         status: SocketStatus.Failure,
@@ -70,13 +71,21 @@ export async function releaseSeatController(socket: Socket, data: { showId: stri
       });
     }
 
+    if (seat.status === SeatStatus.Available) {
+      return socket.emit('seatResponse', {
+        status: SocketStatus.Failure,
+        message: messages.SEAT_ALREADY_FREED,
+      });
+    }
+
     seat.status = SeatStatus.Available;
+    seat.expirationTime = null;
     show.save();
     socket.emit('seatResponse', {
       status: SocketStatus.Success,
       message: messages.SEAT_RESERVED_NOW,
     });
-    getIo().emit('seatUpdate', { ...data, seatStatus: seat.status });
+    getIo()!.emit('seatUpdate', { ...data, seatStatus: seat.status });
   } catch (error) {
     if (error instanceof Error) {
       logError(error);
@@ -99,7 +108,7 @@ export async function confirmSeatController(socket: Socket, data: { showId: stri
     }
 
     const seat = show.seats.find(seat => seat.x === x && seat.y === y);
-    if (seat === undefined) {
+    if (!seat) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {
         status: SocketStatus.Failure,
@@ -115,12 +124,13 @@ export async function confirmSeatController(socket: Socket, data: { showId: stri
     }
 
     seat.status = SeatStatus.Booked;
+    seat.expirationTime = null;
     show.save();
     socket.emit('seatResponse', {
       status: SocketStatus.Success,
       message: messages.SEAT_BOOKED_NOW,
     });
-    getIo().emit('seatUpdate', { ...data, seatStatus: seat.status });
+    getIo()!.emit('seatUpdate', { ...data, seatStatus: seat.status });
   } catch (error) {
     if (error instanceof Error) {
       logError(error);

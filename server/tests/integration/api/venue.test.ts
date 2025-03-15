@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from './../../../src/app';
 import { Venue } from '../../../src/models/venue.model';
 
-jest.mock('../../../src/models/venue.model'); // Mock Venue model
+jest.mock('../../../src/models/venue.model');
 
 describe('Venues API', () => {
   const venueId = new mongoose.Types.ObjectId().toString();

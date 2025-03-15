@@ -1,11 +1,8 @@
-import mongoose from 'mongoose';
 import 'dotenv/config';
 import { Venue } from '../models/venue.model';
-import { config } from '../config/config';
 import { logError, messages } from '../config/logger';
 
-// Sample Venues with Sections
-export const venues = [
+const venues = [
   {
     name: 'Royal Theatre',
     location: '123 Main St',
@@ -36,23 +33,16 @@ export const venues = [
 
 export async function seedVenues() {
   try {
-    await mongoose.connect(config.MONGODB_URI!);
-    console.log(messages.MONGODB_CONNECTION_SUCCESS);
-
-    // Clear existing venues
     await Venue.deleteMany({});
     console.log(messages.CLEARED_RECORDS('Venues'));
 
-    // Insert new venues
     await Venue.insertMany(venues);
     console.log(messages.SEED_SUCCESS('Venues'));
-    mongoose.connection.close();
   } catch (error) {
     if (error instanceof Error) {
       logError(error);
     } else {
       console.error(messages.UNKNOWN_ERROR);
     }
-    mongoose.connection.close();
   }
 }

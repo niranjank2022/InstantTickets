@@ -13,14 +13,18 @@ export const messages = Object.freeze({
   SEEDS_COMPLETED: 'All seeds completed.',
   SEED_SUCCESS: (model: string) => `${model} seeded successfully.`,
   SEAT_ALREADY_RESERVED: 'Seat was already reserved.',
+  SEAT_ALREADY_FREED: 'Seat was already made available.',
   SEAT_RESERVED_NOW: 'Seat has been reserved.',
   SEAT_BOOKED_NOW: 'Seat has been booked.',
   SEAT_NOT_FOUND: 'Seat not found.',
   SEAT_CANNOT_BOOK: "Error: Can't book this seat.",
+  SEAT_CLEANUP_ERROR: "Error: Can't cleanup the seats (node-cron).",
   CLIENT_CONNECTED: (sockedId: string) => `New socket client connected: ${sockedId}`,
   CLIENT_DISCONNECTED: (sockedId: string) => `New socket client disconnected: ${sockedId}`,
   SOCKET_INIT_ERROR: 'Error: Socket.io is not initialized.',
   SEAT_CLEANUP_STARTED: 'Seats are being checked for timeout of reservation expiry time...',
+  VALIDATION_ERROR: 'Validation failed',
+
 });
 
 export function logError(error: Error) {

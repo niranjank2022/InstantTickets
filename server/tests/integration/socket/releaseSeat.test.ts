@@ -19,7 +19,6 @@ describe('releaseSeatController', () => {
   });
 
   beforeEach(() => {
-    // Mock socket.emit()
     mockSocket = {
       emit: jest.fn(),
     } as Partial<ServerSocket>;
@@ -46,7 +45,6 @@ describe('releaseSeatController', () => {
       message: messages.SEAT_RESERVED_NOW,
     });
 
-    // Check if the seat status was updated to Available
     expect((await Show.findById(showId))!.seats[0].status).toBe(SeatStatus.Available);
   });
 
@@ -72,6 +70,21 @@ describe('releaseSeatController', () => {
     expect(mockSocket.emit).toHaveBeenCalledWith('seatResponse', {
       status: SocketStatus.Failure,
       message: messages.SEAT_NOT_FOUND,
+    });
+  });
+
+  test('should return failure if seat is not selected priorly', async () => {
+    (Show.findById as jest.Mock).mockResolvedValue({
+      _id: showId,
+      seats: [{ x: 1, y: 1, status: SeatStatus.Available }],
+      save: jest.fn(),
+    });
+
+    await releaseSeatController(mockSocket as ServerSocket, { showId, x: 1, y: 1 });
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('seatResponse', {
+      status: SocketStatus.Failure,
+      message: messages.SEAT_ALREADY_FREED,
     });
   });
 
