@@ -1,14 +1,13 @@
 import { Socket } from 'socket.io';
-
 import { getIo } from './socket';
-import { Show } from '../models/show.model';
+import { ShowService } from '../services/show.service';
 import { SeatStatus, SocketStatus } from '../config/enum';
 import { logError, messages } from '../config/logger';
 
 export async function selectSeatController(socket: Socket, data: { showId: string; x: number; y: number }) {
   try {
     const { showId, x, y } = data;
-    const show = await Show.findById(showId);
+    const show = await ShowService.getShowById(showId);
     if (!show) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {
@@ -53,7 +52,7 @@ export async function selectSeatController(socket: Socket, data: { showId: strin
 export async function releaseSeatController(socket: Socket, data: { showId: string; x: number; y: number }) {
   try {
     const { showId, x, y } = data;
-    const show = await Show.findById(showId);
+    const show = await ShowService.getShowById(showId);
     if (!show) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {
@@ -98,7 +97,7 @@ export async function releaseSeatController(socket: Socket, data: { showId: stri
 export async function confirmSeatController(socket: Socket, data: { showId: string; x: number; y: number }) {
   try {
     const { showId, x, y } = data;
-    const show = await Show.findById(showId);
+    const show = await ShowService.getShowById(showId);
     if (!show) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {

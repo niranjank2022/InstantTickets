@@ -1,20 +1,22 @@
 import cron from 'node-cron';
 import { startSeatCleanupJob } from '../../../src/socket/seatCleanup.job';
-import { Show } from '../../../src/models/show.model';
+import { ShowService } from '../../../src/services/show.service';
 import { getIo } from '../../../src/socket/socket';
 import { SeatStatus } from '../../../src/config/enum';
 
 jest.mock('node-cron');
-jest.mock('../../../src/models/show.model');
+jest.mock('../../../src/services/show.service');
 jest.mock('../../../src/socket/socket');
 
 describe('startSeatCleanupJob', () => {
+  let mockEmit: jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
 
-    (getIo as jest.Mock).mockReturnValue({
-      emit: jest.fn(),
-    });
+    // Ensure getIo().emit is properly mocked
+    mockEmit = jest.fn();
+    (getIo as jest.Mock).mockReturnValue({ emit: mockEmit });
   });
 
   test('should reset expired seats to Available', async () => {
@@ -26,8 +28,7 @@ describe('startSeatCleanupJob', () => {
       ],
       save: jest.fn(),
     };
-
-    (Show.find as jest.Mock).mockResolvedValue([mockShow]);
+    (ShowService.getShowsWithExpiredSeats as jest.Mock).mockResolvedValue([mockShow]);
 
     startSeatCleanupJob();
 
@@ -37,7 +38,7 @@ describe('startSeatCleanupJob', () => {
     expect(mockShow.seats[0].status).toBe(SeatStatus.Available);
     expect(mockShow.seats[0].expirationTime).toBeNull();
     expect(mockShow.save).toHaveBeenCalled();
-    expect(getIo().emit).toHaveBeenCalledWith('seatUpdate', {
+    expect(mockEmit).toHaveBeenCalledWith('seatUpdate', {
       x: 1,
       y: 1,
       showId: 'show123',
@@ -51,8 +52,7 @@ describe('startSeatCleanupJob', () => {
       seats: [{ x: 2, y: 2, status: SeatStatus.Reserved, expirationTime: new Date(Date.now() + 60000) }],
       save: jest.fn(),
     };
-
-    (Show.find as jest.Mock).mockResolvedValue([mockShow]);
+    (ShowService.getShowsWithExpiredSeats as jest.Mock).mockResolvedValue([mockShow]);
 
     startSeatCleanupJob();
 
@@ -64,27 +64,38 @@ describe('startSeatCleanupJob', () => {
   });
 
   test('should handle no expired seats gracefully', async () => {
-    (Show.find as jest.Mock).mockResolvedValue([]);
+    (ShowService.getShowsWithExpiredSeats as jest.Mock).mockResolvedValue([]);
 
     startSeatCleanupJob();
 
     const cronCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
     await cronCallback();
 
-    expect(getIo().emit).not.toHaveBeenCalled();
+    expect(mockEmit).not.toHaveBeenCalled();
   });
 
   test('should handle errors without crashing', async () => {
-    let cronCallback;
-    (Show.find as jest.Mock).mockRejectedValue(new Error('DB Error'));
+    const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    (ShowService.getShowsWithExpiredSeats as jest.Mock).mockRejectedValue(new Error('DB Error'));
+
     startSeatCleanupJob();
-    cronCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
+    const cronCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
+
     await expect(cronCallback()).resolves.not.toThrow();
 
-    (Show.find as jest.Mock).mockRejectedValue({ message: 'error has occurred' });
+    expect(mockConsoleError).toHaveBeenCalled();
+
+    // Test another case with a different error type
+    (ShowService.getShowsWithExpiredSeats as jest.Mock).mockRejectedValue({ message: 'error has occurred' });
+
     startSeatCleanupJob();
-    cronCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
-    await expect(cronCallback()).resolves.not.toThrow();
+    const cronCallback2 = (cron.schedule as jest.Mock).mock.calls[1][1];
+
+    await expect(cronCallback2()).resolves.not.toThrow();
+    expect(mockConsoleError).toHaveBeenCalled();
+
+    mockConsoleError.mockRestore();
   });
 
   test('should schedule cron job correctly', () => {

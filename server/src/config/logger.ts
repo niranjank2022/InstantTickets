@@ -25,6 +25,23 @@ export const messages = Object.freeze({
   SEAT_CLEANUP_STARTED: 'Seats are being checked for timeout of reservation expiry time...',
   VALIDATION_ERROR: 'Validation failed',
 
+  RANDOM_ERROR: 'Some error',
+
+  venue: {
+    FIND_ERROR: 'Error finding venue: ',
+    INSERT_ERROR: 'Error inserting venues: ',
+    DELETE_ERROR: 'Error deleting venues: ',
+  },
+  show: {
+    FIND_ERROR: 'Error finding show: ',
+    INSERT_ERROR: 'Error inserting show: ',
+    DELETE_ERROR: 'Error deleting shows: ',
+  },
+  booking: {
+    FIND_ERROR: 'Error finding booking: ',
+    CREATE_ERROR: 'Error creating booking: ',
+    DELETE_ERROR: 'Error deleting booking: ',
+  },
 });
 
 export function logError(error: Error) {

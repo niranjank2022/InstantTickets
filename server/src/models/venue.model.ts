@@ -9,7 +9,7 @@ interface ISection {
   price: number;
 }
 
-interface IVenue extends Document {
+export interface IVenue extends Document {
   name: string;
   location: string;
   rows: number;

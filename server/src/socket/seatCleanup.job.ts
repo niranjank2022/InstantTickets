@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { Show } from '../models/show.model';
+import { ShowService } from '../services/show.service';
 import { getIo } from '../socket/socket';
 import { logError, messages } from '../config/logger';
 import { SeatStatus } from '../config/enum';
@@ -8,8 +8,7 @@ export function startSeatCleanupJob() {
   cron.schedule('* * * * *', async () => {
     try {
       console.log(messages.SEAT_CLEANUP_STARTED);
-
-      const expiredShows = await Show.find({ 'seats.expirationTime': { $lt: new Date() } });
+      const expiredShows = await ShowService.getShowsWithExpiredSeats();
 
       for (const show of expiredShows) {
         let updated = false;

@@ -1,11 +1,11 @@
 import { Server as HttpServer } from 'http';
 import { Server as SocketServer, Socket as ServerSocket } from 'socket.io';
 import { selectSeatController } from '../../../src/socket/socket.controller';
-import { Show } from '../../../src/models/show.model';
+import { ShowService } from '../../../src/services/show.service';
 import { SeatStatus, SocketStatus } from '../../../src/config/enum';
 import { messages } from '../../../src/config/logger';
 
-jest.mock('../../../src/models/show.model');
+jest.mock('../../../src/services/show.service');
 
 describe('selectSeatController', () => {
   let io: SocketServer;
@@ -32,7 +32,7 @@ describe('selectSeatController', () => {
   });
 
   test('should reserve an available seat', async () => {
-    (Show.findById as jest.Mock).mockResolvedValue({
+    (ShowService.getShowById as jest.Mock).mockResolvedValue({
       _id: showId,
       seats: [{ x: 1, y: 1, status: SeatStatus.Available }],
       save: jest.fn(),
@@ -47,7 +47,7 @@ describe('selectSeatController', () => {
   });
 
   test('should return failure if show is not found', async () => {
-    (Show.findById as jest.Mock).mockResolvedValue(null);
+    (ShowService.getShowById as jest.Mock).mockResolvedValue(null);
 
     await selectSeatController(mockSocket as ServerSocket, { showId, x: 1, y: 1 });
 
@@ -58,7 +58,7 @@ describe('selectSeatController', () => {
   });
 
   test('should return failure if seat is not found', async () => {
-    (Show.findById as jest.Mock).mockResolvedValue({
+    (ShowService.getShowById as jest.Mock).mockResolvedValue({
       _id: showId,
       seats: [],
     });
@@ -72,7 +72,7 @@ describe('selectSeatController', () => {
   });
 
   test('should return failure if seat is already reserved', async () => {
-    (Show.findById as jest.Mock).mockResolvedValue({
+    (ShowService.getShowById as jest.Mock).mockResolvedValue({
       _id: showId,
       seats: [{ x: 1, y: 1, status: SeatStatus.Reserved }],
     });
@@ -88,11 +88,11 @@ describe('selectSeatController', () => {
   test('should handle errors', async () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
-    (Show.findById as jest.Mock).mockRejectedValue(new Error('Database error'));
+    (ShowService.getShowById as jest.Mock).mockRejectedValue(new Error('Database error'));
     await selectSeatController(mockSocket as ServerSocket, { showId, x: 1, y: 1 });
     expect(consoleSpy).toHaveBeenCalled();
 
-    (Show.findById as jest.Mock).mockRejectedValue({ message: 'error has occurred' });
+    (ShowService.getShowById as jest.Mock).mockRejectedValue({ message: 'error has occurred' });
     await selectSeatController(mockSocket as ServerSocket, { showId, x: 1, y: 1 });
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();

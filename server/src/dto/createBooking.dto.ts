@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsArray, IsString, ArrayNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsArray, IsString, ArrayNotEmpty, ArrayMinSize } from 'class-validator';
 
 export class createBookingDto {
   @IsNotEmpty()
@@ -15,7 +15,8 @@ export class createBookingDto {
 
   @IsArray()
   @ArrayNotEmpty()
+  @ArrayMinSize(1)
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
-  seats!: string[];
+  bookedSeats!: string[];
 }

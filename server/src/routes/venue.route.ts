@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getVenueById } from '../controllers/venue.controller';
+import { VenueController } from '../controllers/venue.controller';
 
 const router = Router();
-router.get('/:venueId/', getVenueById);
+router.get('/:venueId/', VenueController.getVenueById);
 
 export default router;
