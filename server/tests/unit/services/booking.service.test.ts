@@ -3,7 +3,7 @@ import { IBooking } from '../../../src/models/booking.model';
 import { BookingService } from '../../../src/services/booking.service';
 import { BookingRepository } from '../../../src/repositories/booking.repository';
 import { messages } from '../../../src/config/logger';
-import Sample from '../../../src/seeds/sample';
+import Sample from '../../../seeds/sample';
 
 jest.mock('../../../src/repositories/booking.repository');
 

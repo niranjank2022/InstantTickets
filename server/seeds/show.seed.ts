@@ -1,17 +1,16 @@
 import 'dotenv/config';
-import { Show } from '../models/show.model';
-import { messages, logError } from '../config/logger';
+import { ShowService } from '../src/services/show.service';
+import { messages, logError } from '../src/config/logger';
 import Sample from './sample';
 
 export async function seedShows() {
   try {
     // Clear existing shows
-    await Show.deleteMany({});
+    await ShowService.deleteAllShows();
     console.log(messages.CLEARED_RECORDS('Shows'));
 
     // Insert new shows
-    const shows = Sample.shows;
-    await Show.insertMany(shows);
+    await ShowService.addMultipleShows(Sample.shows);
     console.log(messages.SEED_SUCCESS('Shows'));
   } catch (error) {
     if (error instanceof Error) {

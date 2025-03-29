@@ -1,10 +1,10 @@
 import 'dotenv/config';
-import { logError, messages } from '../config/logger';
-import { Booking } from '../models/booking.model';
+import { logError, messages } from '../src/config/logger';
+import { BookingService } from '../src/services/booking.service';
 
 export async function seedBookings() {
   try {
-    await Booking.deleteMany({});
+    await BookingService.deleteAllBookings();
     console.log(messages.CLEARED_RECORDS('Bookings'));
   } catch (error) {
     if (error instanceof Error) {

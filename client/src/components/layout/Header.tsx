@@ -13,8 +13,6 @@ export default function Header() {
                 <span className="lobster-regular fs-3">Instant⚡Tickets</span>
               </div>
               <div className="col-9">
-                {" "}
-                {/* Takes up 3/4 of the space */}
                 <SearchBar />
               </div>
             </div>

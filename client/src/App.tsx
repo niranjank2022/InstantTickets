@@ -1,12 +1,13 @@
 import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+import ExploreHome from "./pages/ExploreHome";
 
 function App() {
   return (
     <>
-      <Header></Header>
-      <div className="container-fluid p-4">
-        <h1>Hello World</h1>
-      </div>{" "}
+      <Header />
+      <ExploreHome />
+      <Footer />
     </>
   );
 }

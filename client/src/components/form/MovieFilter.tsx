@@ -1,4 +1,4 @@
-export default function ExploreMovies() {
+export default function MovieFilter() {
   return (
     <>
       <div className="container-fluid">

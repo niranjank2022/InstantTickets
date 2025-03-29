@@ -1,7 +1,7 @@
 import { HydratedDocument } from 'mongoose';
 import { IVenue, Venue } from '../../../src/models/venue.model';
 import { VenueRepository } from '../../../src/repositories/venue.repository';
-import Sample from '../../../src/seeds/sample';
+import Sample from '../../../seeds/sample';
 import { messages } from '../../../src/config/logger';
 
 jest.mock('../../../src/models/venue.model');

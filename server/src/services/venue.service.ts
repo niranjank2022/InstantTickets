@@ -12,7 +12,7 @@ export const VenueService = {
     }
   },
 
-  addMultipleVenues: async (venues: IVenue[]) => {
+  addMultipleVenues: async (venues: Partial<IVenue>[]) => {
     try {
       return await VenueRepository.insertMany(venues);
     } catch (error) {

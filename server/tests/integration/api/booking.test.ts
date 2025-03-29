@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from './../../../src/app';
 import { BookingService } from '../../../src/services/booking.service';
-import Sample from '../../../src/seeds/sample';
+import Sample from '../../../seeds/sample';
 
 jest.mock('../../../src/services/booking.service');
 

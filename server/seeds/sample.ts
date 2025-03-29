@@ -1,5 +1,5 @@
-import { SeatStatus } from '../config/enum';
-import { ISeat } from '../models/show.model';
+import { SeatStatus } from '../src/config/enum';
+import { ISeat } from '../src/models/show.model';
 
 const sections = [
   [

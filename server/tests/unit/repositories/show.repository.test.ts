@@ -1,7 +1,7 @@
 import { HydratedDocument } from 'mongoose';
 import { IShow, Show } from '../../../src/models/show.model';
 import { ShowRepository } from '../../../src/repositories/show.repository';
-import Sample from '../../../src/seeds/sample';
+import Sample from '../../../seeds/sample';
 import { messages } from '../../../src/config/logger';
 
 jest.mock('../../../src/models/show.model');

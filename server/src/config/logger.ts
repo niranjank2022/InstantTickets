@@ -37,6 +37,11 @@ export const messages = Object.freeze({
     INSERT_ERROR: 'Error inserting show: ',
     DELETE_ERROR: 'Error deleting shows: ',
   },
+  movie: {
+    FIND_ERROR: 'Error finding movie: ',
+    INSERT_ERROR: 'Error inserting movie: ',
+    DELETE_ERROR: 'Error deleting movies: ',
+  },
   booking: {
     FIND_ERROR: 'Error finding booking: ',
     CREATE_ERROR: 'Error creating booking: ',

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import app from './../../../src/app';
 import { VenueService } from '../../../src/services/venue.service';
-import Sample from './../../../src/seeds/sample';
+import Sample from '../../../seeds/sample';
 
 jest.mock('../../../src/services/venue.service');
 

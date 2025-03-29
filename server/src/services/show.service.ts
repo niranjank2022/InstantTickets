@@ -12,7 +12,7 @@ export const ShowService = {
     }
   },
 
-  addMultipleShows: async (shows: IShow[]) => {
+  addMultipleShows: async (shows: Partial<IShow>[]) => {
     try {
       return await ShowRepository.insertMany(shows);
     } catch (error) {

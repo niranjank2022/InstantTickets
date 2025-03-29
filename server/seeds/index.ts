@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { config } from '../config/config';
-import { messages } from '../config/logger';
+import { config } from '../src/config/config';
+import { messages } from '../src/config/logger';
 import { seedBookings } from './booking.seed';
 import { seedShows } from './show.seed';
 import { seedVenues } from './venue.seed';

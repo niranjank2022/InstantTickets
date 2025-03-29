@@ -1,7 +1,7 @@
 import { HydratedDocument } from 'mongoose';
 import { IBooking, Booking } from '../../../src/models/booking.model';
 import { BookingRepository } from '../../../src/repositories/booking.repository';
-import Sample from '../../../src/seeds/sample';
+import Sample from '../../../seeds/sample';
 import { messages } from '../../../src/config/logger';
 
 jest.mock('../../../src/models/booking.model');
