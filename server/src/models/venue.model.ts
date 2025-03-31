@@ -11,7 +11,7 @@ interface ISection {
 
 export interface IVenue extends Document {
   name: string;
-  location: string;
+  city: string;
   rows: number;
   columns: number;
   rowIndices: string[];
@@ -56,7 +56,7 @@ export const venueSchema = new Schema<IVenue>({
     type: String,
     required: true,
   },
-  location: {
+  city: {
     type: String,
     required: true,
   },

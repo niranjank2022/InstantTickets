@@ -12,7 +12,12 @@ import { startSeatCleanupJob } from './socket/seatCleanup.job';
 const app: Application = express();
 
 // Add middlewares before routes
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:5174',
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 

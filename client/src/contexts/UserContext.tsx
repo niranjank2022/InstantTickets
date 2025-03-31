@@ -14,8 +14,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const storedLogged = JSON.parse(localStorage.getItem("logged") || "false");
   const [logged, setLogged] = useState<boolean>(storedLogged);
   const toggleLogged = () => {
-    setLogged(!logged);
-    localStorage.setItem("logged", JSON.stringify(logged));
+    setLogged((prev) => {
+      localStorage.setItem("logged", JSON.stringify(!prev));
+      return !prev;
+    });
   };
 
   const storedCity = localStorage.getItem("city") || "Chennai";

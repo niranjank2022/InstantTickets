@@ -29,9 +29,9 @@ export const AuthController = {
       res.cookie('token', token, {
         expires: new Date(Date.now() + 1 * 60 * 60 * 1000),
         httpOnly: true,
-        secure: true,
       });
       res.status(201).json({
+        adminId: admin._id,
         message: 'sign in successful',
       });
     } catch (error) {
@@ -63,15 +63,24 @@ export const AuthController = {
       res.cookie('token', token, {
         expires: new Date(Date.now() + 1 * 60 * 60 * 1000),
         httpOnly: true,
-        secure: true,
       });
-      res.status(200).json({
+      res.status(201).json({
+        adminId: admin._id,
         message: 'sign up success',
       });
     } catch (err) {
       res.status(500).json({
         message: 'error occurred',
       });
+    }
+  },
+
+  logout: async (req: Request, res: Response) => {
+    try {
+      res.clearCookie('token');
+      res.status(200).json();
+    } catch (err) {
+      res.status(500).json({ message: 'Internal Server Error: ' + (err as Error).message });
     }
   },
 };

@@ -25,7 +25,7 @@ const sample = {
     {
       _id: 'venueId123',
       name: 'Royal Theatre',
-      location: '123 Main St',
+      city: 'Chennai',
       rows: 20,
       columns: 30,
       rowIndices: [...Array(20).keys()].map(i => String.fromCharCode(65 + i)), // A - T
@@ -39,7 +39,7 @@ const sample = {
     {
       _id: 'venueId456',
       name: 'Grand Arena',
-      location: '456 Broadway',
+      city: '456 Broadway',
       rows: 25,
       columns: 40,
       rowIndices: [...Array(25).keys()].map(i => String.fromCharCode(65 + i)), // A - Y

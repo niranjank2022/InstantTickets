@@ -1,32 +1,74 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import UserContext from "../../contexts/UserContext";
+import { api } from "../../services/api";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function UserProfile() {
+  const navigate = useNavigate();
   const userContext = useContext(UserContext);
+  const [isOpen, setIsOpen] = useState(false); // State to toggle dropdown
 
   if (!userContext) {
     throw new Error("Error: UserProfile must be used within a UserProvider!");
   }
 
   const { logged, toggleLogged, username } = userContext;
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout", {}, { withCredentials: true });
+      toggleLogged();
+      localStorage.removeItem("logged");
+      setIsOpen(false);
+      alert("Logged out successfully");
+      navigate("/admin/login");
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        alert(err.response.data.message);
+      } else {
+        alert("Unknown error occurred");
+      }
+    }
+  };
 
   return (
-    <div>
+    <div className="position-relative">
       {logged ? (
-        <div className="row align-items-center">
+        <div>
+          {/* Profile Icon - Click to Toggle Dropdown */}
           <div
             className="border border-dark rounded-circle d-flex justify-content-center align-items-center"
+            role="button"
+            tabIndex={0}
             style={{
-              width: "25px",
-              height: "25px",
-              backgroundColor: "#f0f0f0", // Optional background color
+              width: "30px",
+              height: "30px",
+              backgroundColor: "#f0f0f0",
+              cursor: "pointer",
             }}
+            onClick={() => setIsOpen(!isOpen)}
           >
-            <i className="fa-solid fa-user" style={{ fontSize: "16px" }}></i>
+            <i className="fa-solid fa-user" style={{ fontSize: "18px" }}></i>
           </div>
-          <div className="col-6 text-nowrap">
-            Hi, {username}!
-          </div>
+
+          {/* Dropdown Menu */}
+          {isOpen && (
+            <div
+              className="position-absolute bg-white border rounded shadow p-2"
+              style={{
+                top: "40px",
+                right: "0",
+                width: "150px",
+                zIndex: 1000,
+              }}
+            >
+              <p className="m-0 text-center">Hi, {username}!</p>
+              <hr className="my-2" />
+              <button className="btn btn-danger w-100" onClick={handleLogout}>
+                Log Out
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <button className="btn btn-primary" onClick={() => toggleLogged()}>
