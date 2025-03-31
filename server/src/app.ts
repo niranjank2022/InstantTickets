@@ -1,5 +1,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { messages } from './config/logger';
 import authRouter from './routes/auth.route';
 import bookingsRouter from './routes/booking.route';
@@ -12,6 +13,7 @@ const app: Application = express();
 
 // Add middlewares before routes
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 
 // Mount the API routes

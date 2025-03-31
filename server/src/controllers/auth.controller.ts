@@ -26,10 +26,13 @@ export const AuthController = {
       const token = jwt.sign({ adminId: admin._id }, config.JWT_SECRET_KEY!, {
         expiresIn: config.TOKEN_EXPIRATION_DURATION,
       });
+      res.cookie('token', token, {
+        expires: new Date(Date.now() + 1 * 60 * 60 * 1000),
+        httpOnly: true,
+        secure: true,
+      });
       res.status(201).json({
         message: 'sign in successful',
-        adminId: admin._id,
-        token,
       });
     } catch (error) {
       res.status(500).json({
@@ -57,10 +60,13 @@ export const AuthController = {
       const token = jwt.sign({ adminId: admin._id }, config.JWT_SECRET_KEY!, {
         expiresIn: config.TOKEN_EXPIRATION_DURATION,
       });
+      res.cookie('token', token, {
+        expires: new Date(Date.now() + 1 * 60 * 60 * 1000),
+        httpOnly: true,
+        secure: true,
+      });
       res.status(200).json({
         message: 'sign up success',
-        adminId: admin._id,
-        token,
       });
     } catch (err) {
       res.status(500).json({
