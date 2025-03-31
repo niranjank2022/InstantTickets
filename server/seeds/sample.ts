@@ -15,6 +15,12 @@ const sections = [
 ];
 
 const sample = {
+  admins: [
+    {
+      email: 'admin@gmail.com',
+      password: 'adminpassword',
+    },
+  ],
   venues: [
     {
       _id: 'venueId123',

@@ -51,7 +51,7 @@ const sectionSchema = new Schema<ISection>(
   }
 );
 
-const venueSchema = new Schema<IVenue>({
+export const venueSchema = new Schema<IVenue>({
   name: {
     type: String,
     required: true,

@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
-
 import { messages } from './config/logger';
+import authRouter from './routes/auth.route';
 import bookingsRouter from './routes/booking.route';
 import showsRouter from './routes/show.route';
 import venuesRouter from './routes/venue.route';
@@ -15,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 // Mount the API routes
+app.use('/apis/auth/', authRouter);
 app.use('/apis/bookings/', bookingsRouter);
 app.use('/apis/shows/', showsRouter);
 app.use('/apis/venues/', venuesRouter);
