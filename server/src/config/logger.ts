@@ -1,13 +1,16 @@
 import { config } from './config';
 
 export const messages = Object.freeze({
+  UNKNOWN_ERROR: 'Unknown error occurred.',
+
   MONGODB_CONNECTION_SUCCESS: 'Connected to MongoDB successfully',
   MONGODB_CONNECTION_FAILURE: 'Error: MongoDB connection failure',
   SERVER_RUNNING: `Server is running on port ${config.PORT}`,
+  ROUTE_NOT_FOUND: "Error: Sorry, that route doesn't exist.",
+  
+  
   RECORD_NOT_FOUND: 'Error: No records were found.',
   SERVER_ERROR: 'Error: Some error happened while processing the request.',
-  ROUTE_NOT_FOUND: "Error: Sorry, that route doesn't exist.",
-  UNKNOWN_ERROR: 'Unknown error occurred.',
   CLEARED_RECORDS: (model: string) => `Cleared existing ${model} records.`,
   SEEDS_RUNNING: 'Running all seed scripts.',
   SEEDS_COMPLETED: 'All seeds completed.',

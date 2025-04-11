@@ -1,13 +1,13 @@
-import { useContext, useState } from "react";
-import UserContext from "../../contexts/UserContext";
-import { api } from "../../services/api";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import UserContext from "../../contexts/UserContext";
+import AuthApis from "../../services/auth.api";
 
 export default function UserProfile() {
   const navigate = useNavigate();
   const userContext = useContext(UserContext);
-  const [isOpen, setIsOpen] = useState(false); // State to toggle dropdown
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!userContext) {
     throw new Error("Error: UserProfile must be used within a UserProvider!");
@@ -16,12 +16,12 @@ export default function UserProfile() {
   const { logged, toggleLogged, username } = userContext;
   const handleLogout = async () => {
     try {
-      await api.post("/auth/logout", {}, { withCredentials: true });
+      await AuthApis.logout();
       toggleLogged();
       localStorage.removeItem("logged");
       setIsOpen(false);
       alert("Logged out successfully");
-      navigate("/admin/login");
+      navigate("/login");
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
         alert(err.response.data.message);
