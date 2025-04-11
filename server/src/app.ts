@@ -23,11 +23,11 @@ app.use(cookieParser());
 app.use(express.json());
 
 // Mount the API routes
-app.use('/apis/auth/', authRouter);
-app.use('/apis/bookings/', bookingsRouter);
-app.use('/apis/shows/', showsRouter);
-app.use('/apis/venues/', venuesRouter);
-app.use('/apis/movies/', moviesRouter);
+app.use('/apis/auth', authRouter);
+app.use('/apis/bookings', bookingsRouter);
+app.use('/apis/shows', showsRouter);
+app.use('/apis/venues', venuesRouter);
+app.use('/apis/movies', moviesRouter);
 
 // Error handling middleware
 app.use((req, res) => {

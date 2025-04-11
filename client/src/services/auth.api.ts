@@ -8,7 +8,7 @@ export enum Roles {
 
 const AuthApis = {
   signin: async function (email: string, password: string, role: Roles) {
-    const res = await api.post("auth/signin", {
+    const res = await api.post("/auth/signin", {
       email: email,
       password: password,
       role: role,
@@ -18,7 +18,7 @@ const AuthApis = {
   },
 
   signup: async function (email: string, password: string, role: Roles) {
-    const res = await api.post("auth/signup", {
+    const res = await api.post("/auth/signup", {
       email: email,
       password: password,
       role: role,
