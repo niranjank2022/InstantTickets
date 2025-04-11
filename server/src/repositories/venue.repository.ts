@@ -1,32 +1,23 @@
+import { FilterQuery } from 'mongoose';
 import { Venue, IVenue } from '../models/venue.model';
 import { messages } from '../config/logger';
-import { FilterQuery } from 'mongoose';
 
 export const VenueRepository = {
-  findById: async (id: string): Promise<IVenue | null> => {
+  create: async (venue: Partial<IVenue>) => {
     try {
-      return await Venue.findById(id);
+      return Venue.create(venue);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
-      throw new Error(messages.venue.FIND_ERROR + errorMessage);
+      throw new Error('Error: ' + errorMessage);
     }
   },
 
-  insertMany: async (venues: Partial<IVenue>[]) => {
+  findOne: async (venue: FilterQuery<IVenue>) => {
     try {
-      return await Venue.insertMany(venues);
+      return await Venue.findOne(venue);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
-      throw new Error(messages.venue.INSERT_ERROR + errorMessage);
-    }
-  },
-
-  deleteMany: async (filter: Partial<IVenue>) => {
-    try {
-      return await Venue.deleteMany(filter as FilterQuery<IVenue>);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
-      throw new Error(messages.venue.DELETE_ERROR + errorMessage);
+      throw new Error('Error: ' + errorMessage);
     }
   },
 };

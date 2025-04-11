@@ -1,12 +1,13 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
-interface ISection {
+export interface ISection {
   name: string;
   x: number;
   y: number;
   rows: number;
   columns: number;
   price: number;
+  color: string;
 }
 
 export interface IVenue extends Document {
@@ -14,8 +15,6 @@ export interface IVenue extends Document {
   city: string;
   rows: number;
   columns: number;
-  rowIndices: string[];
-  columnIndices: string[];
   sections: ISection[];
 }
 
@@ -45,6 +44,10 @@ const sectionSchema = new Schema<ISection>(
       type: Number,
       required: true,
     },
+    color: {
+      type: String,
+      required: true,
+    },
   },
   {
     _id: false,
@@ -66,14 +69,6 @@ export const venueSchema = new Schema<IVenue>({
   },
   columns: {
     type: Number,
-    required: true,
-  },
-  rowIndices: {
-    type: [String],
-    required: true,
-  },
-  columnIndices: {
-    type: [String],
     required: true,
   },
   sections: {
