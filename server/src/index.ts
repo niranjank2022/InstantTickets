@@ -1,6 +1,7 @@
 import http from 'http';
-import { initializeSocket } from './socket/socket';
 import mongoose from 'mongoose';
+import { initializeSocket } from './socket/socket';
+import 'reflect-metadata';
 
 import app from './app';
 import { config } from './config/config';

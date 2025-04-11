@@ -6,4 +6,6 @@ export const config = Object.freeze({
   PORT: process.env.PORT,
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
   TOKEN_EXPIRATION_DURATION: '1h',
+  TOKEN_EXPIRATION_DURATION_MILLISEC: 1 * 60 * 60 * 1000,
+  HASH_SALT: 10,
 });

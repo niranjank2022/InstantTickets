@@ -1,21 +1,34 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
+import { TheatreAdminService } from '../services/theatreAdmin.service';
+import { MovieAdminService } from '../services/movieAdmin.service';
+import { UserService } from '../services/user.service';
 import { config } from '../config/config';
-import { AdminService } from '../services/admin.service';
+import { Roles } from '../config/enum';
+import { messages } from '../config/logger';
 
 export const AuthController = {
   signin: async (req: Request, res: Response) => {
     try {
-      const { email, password } = req.body;
-      const admin = await AdminService.getAdminByEmail(email);
-      if (!admin) {
+      const { email, password, role } = req.body;
+
+      let user;
+      if (role === Roles.TheatreAdmin) {
+        user = await TheatreAdminService.getTheatreAdminByEmail(email);
+      } else if (role === Roles.MovieAdmin) {
+        user = await MovieAdminService.getMovieAdminByEmail(email);
+      } else {
+        user = await UserService.getUserByEmail(email);
+      }
+
+      if (!user) {
         res.status(404).json({
-          message: 'User not found',
+          message: 'user not found',
         });
         return;
       }
 
-      if (!(await admin.isValidPassword(password))) {
+      if (!(await user.isValidPassword(password))) {
         res.status(400).json({
           message: 'email or password incorrect',
         });
@@ -23,20 +36,20 @@ export const AuthController = {
       }
 
       // Create a JWT token and return with the response
-      const token = jwt.sign({ adminId: admin._id }, config.JWT_SECRET_KEY!, {
+      const token = jwt.sign({ userId: user.id, email: email, role: role }, config.JWT_SECRET_KEY!, {
         expiresIn: config.TOKEN_EXPIRATION_DURATION,
       });
       res.cookie('token', token, {
-        expires: new Date(Date.now() + 1 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + config.TOKEN_EXPIRATION_DURATION_MILLISEC),
         httpOnly: true,
       });
       res.status(201).json({
-        adminId: admin._id,
+        userId: user.id,
         message: 'sign in successful',
       });
     } catch (error) {
       res.status(500).json({
-        message: 'error occurred',
+        message: messages.SERVER_ERROR,
         error,
       });
     }
@@ -44,33 +57,48 @@ export const AuthController = {
 
   signup: async (req: Request, res: Response) => {
     try {
-      const { email, password } = req.body;
+      const { email, password, role } = req.body;
 
-      // Checking if admin exists
-      const adminExists = await AdminService.doesAdminExists(email);
-      if (adminExists) {
+      let userExists = false;
+      if (role === Roles.TheatreAdmin) {
+        userExists = await TheatreAdminService.doesTheatreAdminExists(email);
+      } else if (role === Roles.MovieAdmin) {
+        userExists = await MovieAdminService.doesMovieAdminExists(email);
+      } else {
+        userExists = await UserService.doesUserExists(email);
+      }
+
+      if (userExists) {
         res.status(400).json({
           message: 'user already exists',
         });
         return;
       }
-      const admin = await AdminService.createAdmin({ email, password });
 
+      let user;
+      if (role === Roles.TheatreAdmin) {
+        user = await TheatreAdminService.createTheatreAdmin({ email, password });
+      } else if (role === Roles.MovieAdmin) {
+        user = await MovieAdminService.createMovieAdmin({ email, password });
+      } else {
+        user = await UserService.createUser({ email, password });
+      }
       // Create a JWT token and return with the response
-      const token = jwt.sign({ adminId: admin._id }, config.JWT_SECRET_KEY!, {
+      const token = jwt.sign({ userId: user!.id, email: email, role: role }, config.JWT_SECRET_KEY!, {
         expiresIn: config.TOKEN_EXPIRATION_DURATION,
       });
       res.cookie('token', token, {
-        expires: new Date(Date.now() + 1 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + config.TOKEN_EXPIRATION_DURATION_MILLISEC),
         httpOnly: true,
       });
       res.status(201).json({
-        adminId: admin._id,
+        userId: user!.id,
         message: 'sign up success',
       });
-    } catch (err) {
+    } catch (error) {
       res.status(500).json({
-        message: 'error occurred',
+        message: messages.SERVER_ERROR,
+        error,
       });
     }
   },
@@ -79,8 +107,11 @@ export const AuthController = {
     try {
       res.clearCookie('token');
       res.status(200).json();
-    } catch (err) {
-      res.status(500).json({ message: 'Internal Server Error: ' + (err as Error).message });
+    } catch (error) {
+      res.status(500).json({
+        message: messages.SERVER_ERROR,
+        error,
+      });
     }
   },
 };

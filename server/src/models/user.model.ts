@@ -1,14 +1,15 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { config } from '../config/config';
 
-export interface IAdmin extends Document {
+export interface IUser extends Document {
   email: string;
   password: string;
-  venues: string[];
+  bookings: string[];
   isValidPassword(passwd: string): Promise<boolean>;
 }
 
-const adminSchema = new Schema<IAdmin>({
+const userSchema = new Schema<IUser>({
   email: {
     type: String,
     required: true,
@@ -18,16 +19,16 @@ const adminSchema = new Schema<IAdmin>({
     type: String,
     required: true,
   },
-  venues: {
+  bookings: {
     type: [String],
     default: [],
   },
 });
 
-adminSchema.pre('save', async function (next) {
+userSchema.pre('save', async function (next) {
   try {
     if (this.isModified('password')) {
-      this.password = await bcrypt.hash(this.password, 10);
+      this.password = await bcrypt.hash(this.password, config.HASH_SALT);
     }
     next();
   } catch (error) {
@@ -35,9 +36,8 @@ adminSchema.pre('save', async function (next) {
   }
 });
 
-// Method to verify the user Wpassword
-adminSchema.methods.isValidPassword = async function (passwd: string): Promise<boolean> {
+userSchema.methods.isValidPassword = async function (passwd: string): Promise<boolean> {
   return await bcrypt.compare(passwd, this.password);
 };
 
-export const Admin: Model<IAdmin> = mongoose.model<IAdmin>('Admin', adminSchema);
+export const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
