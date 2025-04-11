@@ -28,11 +28,10 @@ export interface IShowData {
 }
 
 const AdminApis = {
-
   addVenue: async function (venueFields: IVenueFields) {
     const { name, city, rows, columns, sections } = venueFields;
     const res = await api.post(
-      "/venues/",
+      "/venues",
       {
         name: name,
         city: city,
@@ -47,12 +46,12 @@ const AdminApis = {
   },
 
   getVenues: async function () {
-    const res = await api.get(`/venues/all/`, { withCredentials: true });
+    const res = await api.get(`/venues/all`, { withCredentials: true });
     return res.data;
   },
 
   getShows: async function (venueId: string) {
-    const res = await api.get(`/shows/venue/${venueId}/`, {
+    const res = await api.get(`/shows/venue/${venueId}`, {
       withCredentials: true,
     });
     return res.data;
@@ -60,7 +59,7 @@ const AdminApis = {
 
   addShow: async function (show: IShowData, venueId: string) {
     const { movieId, movieTitle, language, format, startTime, endTime } = show;
-    const res = await api.post("/shows/", {
+    const res = await api.post("/shows", {
       movieId: movieId,
       venueId: venueId,
       movieTitle: movieTitle,
@@ -78,7 +77,7 @@ const AdminApis = {
   },
 
   getSeatMap: async function (showId: string) {
-    const res = await api.get(`shows/${showId}/seat-map/`);
+    const res = await api.get(`shows/${showId}/seat-map`);
     return res.data;
   },
 };

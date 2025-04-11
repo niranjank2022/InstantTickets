@@ -31,3 +31,9 @@ export const ALL_CITIES = [
   "Kochi",
   "Hyderabad",
 ];
+
+export enum SeatStatus {
+  Booked = "BOOKED",
+  Available = "AVAILABLE",
+  Reserved = "RESERVED",
+}

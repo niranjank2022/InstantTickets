@@ -3,41 +3,30 @@ import { messages } from '../config/logger';
 import { FilterQuery } from 'mongoose';
 
 export const ShowRepository = {
-  findById: async (id: string): Promise<IShow | null> => {
+  create: async (show: Partial<IShow>) => {
     try {
-      return await Show.findById(id);
+      return await Show.create(show);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
-      throw new Error(messages.show.FIND_ERROR + errorMessage);
+      throw new Error('Error: ' + errorMessage);
     }
   },
 
-  insertMany: async (shows: Partial<IShow>[]) => {
+  findById: async (showId: string) => {
     try {
-      return await Show.insertMany(shows);
+      return await Show.findById(showId);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
-      throw new Error(messages.show.INSERT_ERROR + errorMessage);
+      throw new Error('Error: ' + errorMessage);
     }
   },
 
-  deleteMany: async (filter: Partial<IShow>) => {
+  find: async (filter: FilterQuery<IShow>) => {
     try {
-      return await Show.deleteMany(filter as FilterQuery<IShow>);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
-      throw new Error(messages.show.DELETE_ERROR + errorMessage);
-    }
-  },
-
-  find: async (param1: string, param2: any) => {
-    try {
-      const filter: { [key: string]: string } = {};
-      filter[param1] = param2;
       return await Show.find(filter);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
-      throw new Error(messages.show.FIND_ERROR + errorMessage);
+      throw new Error('Error: ' + errorMessage);
     }
   },
 };
