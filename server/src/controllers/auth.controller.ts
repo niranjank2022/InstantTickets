@@ -43,7 +43,7 @@ export const AuthController = {
         expires: new Date(Date.now() + config.TOKEN_EXPIRATION_DURATION_MILLISEC),
         httpOnly: true,
       });
-      res.status(201).json({
+      res.status(200).json({
         userId: user.id,
         message: 'sign in successful',
       });
@@ -59,17 +59,12 @@ export const AuthController = {
     try {
       const { email, password, role } = req.body;
 
-      let userExists = false;
-      if (role === Roles.TheatreAdmin) {
-        userExists = await TheatreAdminService.doesTheatreAdminExists(email);
-      } else if (role === Roles.MovieAdmin) {
-        userExists = await MovieAdminService.doesMovieAdminExists(email);
-      } else {
-        userExists = await UserService.doesUserExists(email);
-      }
-
-      if (userExists) {
-        res.status(400).json({
+      if (
+        (await TheatreAdminService.doesTheatreAdminExists(email)) ||
+        (await MovieAdminService.doesMovieAdminExists(email)) ||
+        (await UserService.doesUserExists(email))
+      ) {
+        res.status(409).json({
           message: 'user already exists',
         });
         return;
@@ -83,6 +78,7 @@ export const AuthController = {
       } else {
         user = await UserService.createUser({ email, password });
       }
+
       // Create a JWT token and return with the response
       const token = jwt.sign({ userId: user!.id, email: email, role: role }, config.JWT_SECRET_KEY!, {
         expiresIn: config.TOKEN_EXPIRATION_DURATION,

@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { MovieService } from '../services/movie.service';
 import { MovieAdminService } from '../services/movieAdmin.service';
@@ -13,6 +13,13 @@ interface ICustomJwtPayload extends JwtPayload {
 export const MovieController = {
   createMovie: async (req: Request, res: Response) => {
     try {
+      const token = req.cookies.token;
+      if (!token) {
+        res.status(401).json({ message: 'Token is not found. Access denied' });
+        return;
+      }
+
+      const { email } = jwt.verify(token, config.JWT_SECRET_KEY!) as ICustomJwtPayload;
       const { title, img, languages, formats, genres, cities } = req.body;
       const movie = await MovieService.createMovie({
         title: title,
@@ -23,12 +30,17 @@ export const MovieController = {
         cities: cities,
       });
 
-      const token = req.cookies.token;
-      const { email } = jwt.verify(token, config.JWT_SECRET_KEY!) as ICustomJwtPayload;
-      MovieAdminService.addMovieId(email, movie.id);
-
+      await MovieAdminService.addMovieId(email, movie.id);
       res.status(201).json({ movieId: movie.id, message: 'movie added successfully' });
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        res.status(401).json({ message: 'Token expired. Please login again.' });
+        return;
+      }
+      if (error instanceof JsonWebTokenError) {
+        res.status(403).json({ message: 'Invalid token.' });
+        return;
+      }
       res.status(500).json({
         message: messages.SERVER_ERROR,
         error,
@@ -43,12 +55,21 @@ export const MovieController = {
         res.status(401).json({ message: 'unauthorized access denied!' });
         return;
       }
+
       const { email } = jwt.verify(token, config.JWT_SECRET_KEY!) as ICustomJwtPayload;
       const movies = await MovieService.getMoviesByAdminEmail(email);
       res.status(200).json({
         movies: movies,
       });
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        res.status(401).json({ message: 'Token expired. Please login again.' });
+        return;
+      }
+      if (error instanceof JsonWebTokenError) {
+        res.status(403).json({ message: 'Invalid token.' });
+        return;
+      }
       res.status(500).json({
         message: messages.SERVER_ERROR,
         error,

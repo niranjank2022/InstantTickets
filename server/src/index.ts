@@ -1,11 +1,11 @@
 import http from 'http';
 import mongoose from 'mongoose';
 import { initializeSocket } from './socket/socket';
-import 'reflect-metadata';
 
 import app from './app';
 import { config } from './config/config';
 import { messages } from './config/logger';
+import { startSeatCleanupJob } from './socket/seatCleanup.job';
 
 // Connect to the database
 mongoose
@@ -20,5 +20,7 @@ initializeSocket(httpServer);
 httpServer.listen(config.PORT, () => {
   console.log(messages.SERVER_RUNNING);
 });
+
+startSeatCleanupJob();
 
 export default httpServer;
