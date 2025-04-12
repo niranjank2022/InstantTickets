@@ -3,7 +3,7 @@ export default {
   testEnvironment: 'node',
   moduleFileExtensions: ['ts', 'js'],
   rootDir: './',
-  testMatch: ['<rootDir>/tests/**/*.test.ts'],
+  testMatch: ['<rootDir>/tests/*.test.ts'],
   transform: {
     transform_regex: [
       'ts-jest',

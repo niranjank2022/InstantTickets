@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { VenueService } from '../services/venue.service';
 import { TheatreAdminService } from '../services/theatreAdmin.service';
@@ -13,6 +13,13 @@ interface ICustomJwtPayload extends JwtPayload {
 export const VenueController = {
   createVenue: async (req: Request, res: Response) => {
     try {
+      const token = req.cookies.token;
+      if (!token) {
+        res.status(401).json({ message: 'unauthorized access denied!' });
+        return;
+      }
+
+      const { email } = jwt.verify(token, config.JWT_SECRET_KEY!) as ICustomJwtPayload;
       const { name, city, rows, columns, sections } = req.body;
       const venueExists = await VenueService.checkVenueExists(name, city);
       if (venueExists) {
@@ -28,12 +35,17 @@ export const VenueController = {
         sections: sections,
       });
 
-      const token = req.cookies.token;
-      const { email } = jwt.verify(token, config.JWT_SECRET_KEY!) as ICustomJwtPayload;
-      TheatreAdminService.addVenueId(email, venue.id);
-
+      await TheatreAdminService.addVenueId(email, venue.id);
       res.status(201).json({ venueId: venue.id, message: 'venue added successfully' });
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        res.status(401).json({ message: 'Token expired. Please login again.' });
+        return;
+      }
+      if (error instanceof JsonWebTokenError) {
+        res.status(403).json({ message: 'Invalid token.' });
+        return;
+      }
       res.status(500).json({
         message: messages.SERVER_ERROR,
         error,
@@ -82,6 +94,14 @@ export const VenueController = {
         venues: venues,
       });
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        res.status(401).json({ message: 'Token expired. Please login again.' });
+        return;
+      }
+      if (error instanceof JsonWebTokenError) {
+        res.status(403).json({ message: 'Invalid token.' });
+        return;
+      }
       res.status(500).json({
         message: messages.SERVER_ERROR,
         error,

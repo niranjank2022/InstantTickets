@@ -6,7 +6,7 @@ export const ShowController = {
   createShow: async (req: Request, res: Response) => {
     try {
       const { movieId, venueId, movieTitle, language, format, startTime, endTime } = req.body;
-      await ShowService.createShow({
+      const show = await ShowService.createShow({
         movieId: movieId,
         venueId: venueId,
         movieTitle: movieTitle,
@@ -15,7 +15,7 @@ export const ShowController = {
         startTime: startTime,
         endTime: endTime,
       });
-      res.status(201).json({ message: 'Created successfully' });
+      res.status(201).json({ message: 'Created successfully', showId: show!.id });
     } catch (error) {
       res.status(500).json({
         message: messages.SERVER_ERROR,
@@ -37,14 +37,14 @@ export const ShowController = {
       }
 
       res.status(200).json({
-        showId: show!._id,
-        venueId: show!.venueId,
-        movieId: show!.movieId,
-        startTime: show!.startTime,
-        endTime: show!.endTime,
-        seats: show!.seats,
-        language: show!.language,
-        format: show!.format,
+        showId: show.id,
+        venueId: show.venueId,
+        movieId: show.movieId,
+        startTime: show.startTime,
+        endTime: show.endTime,
+        seats: show.seats,
+        language: show.language,
+        format: show.format,
       });
     } catch (error) {
       res.status(500).json({
