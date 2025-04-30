@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import MovieAdminApis, { IMovie } from "../services/movieAdmin.api";
+import { Bubble } from "../components/ui/Bubble";
 import {
   ALL_CITIES,
   ALL_FORMATS,
@@ -73,14 +74,6 @@ const MovieList: React.FC = () => {
       return { ...prev, [field]: updatedValues };
     });
   };
-
-  const Bubble = ({
-    text,
-    variant = "primary",
-  }: {
-    text: string;
-    variant?: string;
-  }) => <span className={`badge bg-${variant} rounded-pill me-1`}>{text}</span>;
 
   return (
     <div className="container my-4">

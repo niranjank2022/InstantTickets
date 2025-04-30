@@ -1,9 +1,0 @@
-export default function ExploreMovies() {
-  return (
-    <>
-      <div className="container-fluid">
-        
-      </div>
-    </>
-  );
-}

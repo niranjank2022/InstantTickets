@@ -2,6 +2,7 @@ import { IMovie } from '../models/movie.model';
 import { MovieRepository } from '../repositories/movie.repository';
 import { MovieAdminRepository } from '../repositories/movieAdmin.repository';
 import { messages } from '../config/logger';
+import { Roles } from '../config/enum';
 
 export const MovieService = {
   createMovie: async (movie: Partial<IMovie>) => {
@@ -43,7 +44,7 @@ export const MovieService = {
     }
   },
 
-  getMoviesByCity: async (city: string) => {
+  getMoviesByCity: async (city: string, role: Roles) => {
     try {
       const movies = await MovieRepository.find({ cities: { $in: [city] } });
 
@@ -53,13 +54,25 @@ export const MovieService = {
 
       const res = [];
       for (const movie of movies) {
-        res.push({
-          movieId: movie.id,
-          title: movie.title,
-          img: movie.img,
-          languages: movie.languages,
-          formats: movie.formats,
-        });
+        if (role === Roles.TheatreAdmin) {
+          res.push({
+            movieId: movie.id,
+            title: movie.title,
+            img: movie.img,
+            languages: movie.languages,
+            formats: movie.formats,
+          });
+        } else if (role === Roles.User) {
+          res.push({
+            movieId: movie.id,
+            title: movie.title,
+            img: movie.img,
+            rating: movie.rating,
+            languages: movie.languages,
+            formats: movie.formats,
+            genres: movie.genres,
+          });
+        }
       }
       return res;
     } catch (error) {

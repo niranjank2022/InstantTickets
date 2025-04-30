@@ -18,7 +18,7 @@ export function startSeatCleanupJob() {
             seat.status = SeatStatus.Available;
             seat.expirationTime = null;
             updated = true;
-            getIo().emit('seatUpdate', { x: seat.x, y: seat.y, showId: show._id, status: SeatStatus.Available });
+            getIo().emit('seatUpdate', { x: seat.x, y: seat.y, showId: show.id, status: SeatStatus.Available });
           }
         }
 

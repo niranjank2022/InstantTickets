@@ -33,7 +33,7 @@ export async function selectSeatController(socket: Socket, data: { showId: strin
     }
 
     seat.status = SeatStatus.Reserved;
-    seat.expirationTime = new Date(Date.now() + 3 * 60 * 1000);
+    seat.expirationTime = new Date(Date.now() + 1 * 60 * 1000);
     show.save();
     socket.emit('seatResponse', {
       status: SocketStatus.Success,

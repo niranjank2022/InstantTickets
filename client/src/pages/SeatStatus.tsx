@@ -30,14 +30,28 @@ const SeatMap: React.FC = () => {
     fetchSeatMap();
   }, [show?.showId]);
 
-  const getSeatStyle = (seat: ISeatMap | null) => ({
-    width: "35px",
-    height: "35px",
-    fontSize: "0.7rem",
-    backgroundColor:
-      seat?.status === SeatStatus.Booked ? "#6c757d" : seat?.color || "#f8f9fa",
-    color: seat?.status === SeatStatus.Booked ? "white" : "black",
-  });
+  const getSeatStyle = (seat: ISeatMap | null) => {
+    if (!seat) {
+      return {
+        width: "35px",
+        height: "35px",
+        backgroundColor: "transparent",
+        border: "none",
+        boxShadow: "none",
+        cursor: "default",
+      };
+    }
+
+    return {
+      width: "35px",
+      height: "35px",
+      fontSize: "0.7rem",
+      backgroundColor:
+        seat.status === SeatStatus.Booked ? "#6c757d" : seat.color || "#f8f9fa",
+      color: seat.status === SeatStatus.Booked ? "white" : "black",
+      cursor: seat.status === SeatStatus.Booked ? "not-allowed" : "pointer",
+    };
+  };
 
   const renderSeat = (seat: ISeatMap | null, row: number, col: number) => {
     const seatLabel = seat ? `${String.fromCharCode(65 + row)}${col + 1}` : "";
@@ -46,11 +60,13 @@ const SeatMap: React.FC = () => {
     return (
       <div
         key={`${row}-${col}`}
-        className="d-flex align-items-center justify-content-center border rounded me-1 mb-1 position-relative"
+        className={`d-flex align-items-center justify-content-center rounded me-1 mb-1 position-relative ${
+          seat ? "border" : ""
+        }`}
         style={getSeatStyle(seat)}
-        title={seat?.status || "No seat"}
+        title={seat?.status || ""}
       >
-        {seatLabel}
+        {seat && seatLabel}
         {isBooked && (
           <div
             className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"

@@ -37,3 +37,8 @@ export enum SeatStatus {
   Available = "AVAILABLE",
   Reserved = "RESERVED",
 }
+
+export enum SocketStatus {
+  Success = "SUCCESS",
+  Failure = "FAILURE",
+}

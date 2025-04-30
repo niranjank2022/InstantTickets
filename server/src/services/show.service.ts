@@ -15,6 +15,15 @@ interface ILabel {
   price: number;
 }
 
+type ShowData = {
+  showId: string;
+  venueId: string;
+  startTime: Date;
+  endTime: Date;
+  language: string;
+  format: string;
+};
+
 export const ShowService = {
   getShowById: async (showId: string) => {
     try {
@@ -76,6 +85,40 @@ export const ShowService = {
         });
       }
       return res;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
+      throw new Error('Error: ' + errorMessage);
+    }
+  },
+
+  getShowsByMovieIdCity: async (movieId: string, city: string) => {
+    try {
+      const shows = await ShowRepository.find({ movieId: movieId });
+
+      if (!shows) {
+        return [];
+      }
+
+      const res = new Map<string, ShowData[]>();
+      for (const show of shows) {
+        const venue = await VenueService.getVenueById(show.venueId);
+        if (venue!.city === city) {
+          if (!res.has(venue!.name)) {
+            res.set(venue!.name, []);
+          }
+
+          res.get(venue!.name)!.push({
+            showId: show.id,
+            venueId: venue!.name,
+            startTime: show.startTime,
+            endTime: show.endTime,
+            language: show.language,
+            format: show.format,
+          });
+        }
+      }
+
+      return Object.fromEntries(res);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
       throw new Error('Error: ' + errorMessage);

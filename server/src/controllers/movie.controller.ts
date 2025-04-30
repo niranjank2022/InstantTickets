@@ -79,8 +79,15 @@ export const MovieController = {
 
   getMoviesByCity: async (req: Request, res: Response) => {
     try {
+      const token = req.cookies.token;
+      if (!token) {
+        res.status(401).json({ message: 'unauthorized access denied!' });
+        return;
+      }
+
+      const { role } = jwt.verify(token, config.JWT_SECRET_KEY!) as ICustomJwtPayload;
       const { city } = req.params;
-      const movies = await MovieService.getMoviesByCity(city);
+      const movies = await MovieService.getMoviesByCity(city, role);
       res.status(200).json({
         movies: movies,
       });

@@ -1,4 +1,4 @@
-import { api } from "./api";
+import api from "./api";
 
 export interface ISection {
   name: string;
@@ -27,7 +27,7 @@ export interface IShowData {
   format: string;
 }
 
-const AdminApis = {
+const TheatreAdminApis = {
   addVenue: async function (venueFields: IVenueFields) {
     const { name, city, rows, columns, sections } = venueFields;
     const res = await api.post(
@@ -50,7 +50,7 @@ const AdminApis = {
     return res.data;
   },
 
-  getShows: async function (venueId: string) {
+  getShowsByVenueId: async function (venueId: string) {
     const res = await api.get(`/shows/venue/${venueId}`, {
       withCredentials: true,
     });
@@ -82,4 +82,4 @@ const AdminApis = {
   },
 };
 
-export default AdminApis;
+export default TheatreAdminApis;

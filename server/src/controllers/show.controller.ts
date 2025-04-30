@@ -69,6 +69,21 @@ export const ShowController = {
     }
   },
 
+  getShowsByMovieIdCity: async (req: Request, res: Response) => {
+    try {
+      const { movieId, city } = req.params;
+      const shows = await ShowService.getShowsByMovieIdCity(movieId, city);
+      res.status(200).json({
+        shows: shows,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: messages.SERVER_ERROR,
+        error,
+      });
+    }
+  },
+
   getSeatMap: async (req: Request, res: Response) => {
     try {
       const showId = req.params.showId.trim();

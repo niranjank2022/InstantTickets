@@ -21,7 +21,7 @@ export default function AdminShows() {
   useEffect(() => {
     (async function () {
       try {
-        const res = await AdminApis.getShows(venueId!);
+        const res = await AdminApis.getShowsByVenueId(venueId!);
         setShows(res.shows);
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
