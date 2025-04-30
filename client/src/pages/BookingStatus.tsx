@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import AdminApis from "../services/theatreAdmin.api";
 import { SeatStatus } from "../config/config";
+import UserApis from "../services/user.api";
+import { Socket } from "socket.io-client";
 
 interface ISeat {
   color?: string;
@@ -12,8 +14,16 @@ interface ILabel {
   [key: string]: { color: string; price: number };
 }
 
+interface ISeatUpdate {
+  showId: string;
+  x: number;
+  y: number;
+  seatStatus: SeatStatus;
+}
+
 const getSeatId = (row: number, col: number) =>
   `${String.fromCharCode(65 + row)}${col + 1}`;
+
 
 export default function BookingStatus() {
   const { showId, title } = useLocation().state;
@@ -23,6 +33,58 @@ export default function BookingStatus() {
     const saved = sessionStorage.getItem(`selectedSeats_${showId}`);
     return saved ? JSON.parse(saved) : [];
   });
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+
+  useEffect(() => {
+    const fetchSeatMap = async () => {
+      try {
+        const { seatmap, label } = await AdminApis.getSeatMap(showId);
+        setSeatmap(seatmap);
+        setLabel(label);
+      } catch (error) {
+        console.error("Error fetching seat map:", error);
+      }
+    };
+
+    fetchSeatMap();
+
+    return () => {
+      sessionStorage.removeItem(`selectedSeats_${showId}`);
+    };
+  }, [showId]);
+
+  useEffect(() => {
+    if (!seatMap.length) return; // Wait until seatMap is available
+  
+    const sock = UserApis.initializeSocket();
+    setSocket(sock);
+  
+    const handleSeatUpdate = (data: ISeatUpdate) => {
+      const { x, y, seatStatus } = data;
+  
+      setSeatmap((prev) =>
+        prev.map((row, rowIdx) =>
+          row.map((seat, colIdx) => {
+            if (rowIdx === y && colIdx === x && seat) {
+              return { ...seat, status: seatStatus };
+            }
+            return seat;
+          })
+        )
+      );
+    };
+  
+    sock.on("connect", () => console.log("Socket connected"));
+    sock.on("disconnect", () => console.log("Socket disconnected"));
+    sock.on("seatUpdate", handleSeatUpdate);
+  
+    return () => {
+      sock.off("seatUpdate", handleSeatUpdate);
+      // sock.disconnect();
+    };
+  }, [seatMap]); // ⬅ ensures socket is initialized only after seatMap is ready
+  
 
   useEffect(() => {
     sessionStorage.setItem(
@@ -30,22 +92,6 @@ export default function BookingStatus() {
       JSON.stringify(selectedSeats)
     );
   }, [selectedSeats, showId]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { seatmap, label } = await AdminApis.getSeatMap(showId);
-        setSeatmap(seatmap);
-        setLabel(label);
-      } catch (err) {
-        console.error("Failed to fetch seatMap:", err);
-      }
-    })();
-
-    return () => {
-      sessionStorage.removeItem(`selectedSeats_${showId}`);
-    };
-  }, [showId]);
 
   const toggleSeat = useCallback(
     (row: number, col: number) => {
