@@ -1,5 +1,4 @@
-import { io, Socket } from "socket.io-client";
-import api, { BASE_URL } from "./api";
+import api from "./api";
 
 export interface IMovie {
   movieId: string;
@@ -31,11 +30,6 @@ const UserApis = {
       withCredentials: true,
     });
     return res.data;
-  },
-
-  initializeSocket: function () {
-    const socket = io(BASE_URL);
-    return socket;
   },
 };
 

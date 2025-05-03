@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import AdminApis from "../services/theatreAdmin.api";
-import { SeatStatus } from "../config/config";
-import UserApis from "../services/user.api";
-import { Socket } from "socket.io-client";
+import { SeatStatus, SocketStatus } from "../config/config";
+import { socket } from "../services/socket";
 
 interface ISeat {
   color?: string;
@@ -21,20 +20,37 @@ interface ISeatUpdate {
   seatStatus: SeatStatus;
 }
 
+interface ISeatResponse {
+  status: SocketStatus;
+  message: string;
+  x: number;
+  y: number;
+  type: "select" | "release";
+}
+
 const getSeatId = (row: number, col: number) =>
   `${String.fromCharCode(65 + row)}${col + 1}`;
 
-
 export default function BookingStatus() {
-  const { showId, title } = useLocation().state;
+  const location = useLocation();
+  const { showId, title } = location.state;
   const [seatMap, setSeatmap] = useState<(ISeat | null)[][]>([]);
   const [label, setLabel] = useState<ILabel>({});
   const [selectedSeats, setSelectedSeats] = useState<string[]>(() => {
     const saved = sessionStorage.getItem(`selectedSeats_${showId}`);
     return saved ? JSON.parse(saved) : [];
   });
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const selectedSeatsRef = useRef<string[]>(selectedSeats);
+  const pathnameRef = useRef<string>(location.pathname);
 
+  useEffect(() => {
+    selectedSeatsRef.current = selectedSeats;
+  }, [selectedSeats]);
+
+  useEffect(() => {
+    pathnameRef.current = location.pathname;
+  }, [location.pathname]);
 
   useEffect(() => {
     const fetchSeatMap = async () => {
@@ -47,22 +63,55 @@ export default function BookingStatus() {
       }
     };
 
+    // Always fetch seat map on mount
     fetchSeatMap();
 
+    // Handle first-time load vs refresh
+    const isReloaded = sessionStorage.getItem("reloaded");
+
+    if (!isReloaded && !isConnected) {
+      socket.connect(); // Only connect socket on first load
+    }
+
+    // Mark if it's a refresh
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem("reloaded", "true");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      sessionStorage.removeItem(`selectedSeats_${showId}`);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      const reloaded = sessionStorage.getItem("reloaded");
+      if (!reloaded) {
+        // Only clear and release seats on route change
+        for (const seatId of selectedSeatsRef.current) {
+          const row = seatId.charCodeAt(0) - 65;
+          const col = parseInt(seatId.slice(1)) - 1;
+          socket?.emit("releaseSeat", {
+            showId,
+            x: col,
+            y: row,
+          });
+        }
+        sessionStorage.removeItem(`selectedSeats_${showId}`);
+      } else {
+        sessionStorage.removeItem("reloaded");
+      }
     };
   }, [showId]);
 
+  // Initialize socket connection only once
   useEffect(() => {
-    if (!seatMap.length) return; // Wait until seatMap is available
-  
-    const sock = UserApis.initializeSocket();
-    setSocket(sock);
-  
     const handleSeatUpdate = (data: ISeatUpdate) => {
       const { x, y, seatStatus } = data;
-  
+      const seatId = getSeatId(y, x);
+      if (
+        seatStatus === SeatStatus.Available &&
+        selectedSeatsRef.current.includes(seatId)
+      ) {
+        setSelectedSeats((prev) => prev.filter((id) => id !== seatId));
+      }
+
       setSeatmap((prev) =>
         prev.map((row, rowIdx) =>
           row.map((seat, colIdx) => {
@@ -74,17 +123,49 @@ export default function BookingStatus() {
         )
       );
     };
-  
-    sock.on("connect", () => console.log("Socket connected"));
-    sock.on("disconnect", () => console.log("Socket disconnected"));
-    sock.on("seatUpdate", handleSeatUpdate);
-  
-    return () => {
-      sock.off("seatUpdate", handleSeatUpdate);
-      // sock.disconnect();
+
+    const handleSeatResponse = (data: ISeatResponse) => {
+      const { status, message, x, y, type } = data;
+      const seatId = getSeatId(y, x);
+      if (type === "select") {
+        if (status === SocketStatus.Success) {
+          setSelectedSeats((prev) => [...prev, seatId]);
+        } else {
+          console.error("Failed to reserve seat:", message);
+        }
+      } else if (type === "release") {
+        if (status === SocketStatus.Success) {
+          setSelectedSeats((prev) => prev.filter((id) => id !== seatId));
+        } else {
+          console.error("Failed to release seat:", message);
+        }
+      }
     };
-  }, [seatMap]); // ⬅ ensures socket is initialized only after seatMap is ready
-  
+
+    socket.on("connect", () => {
+      setIsConnected(true);
+      console.log("Socket connected");
+    });
+    socket.on("disconnect", () => {
+      setIsConnected(false);
+      console.log("Socket disconnected");
+    });
+
+    socket.on("seatUpdate", (data) => {
+      handleSeatUpdate(data);
+    });
+
+    socket.on("seatResponse", (data) => {
+      handleSeatResponse(data);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("seatUpdate");
+      socket.off("seatResponse");
+    };
+  }, []);
 
   useEffect(() => {
     sessionStorage.setItem(
@@ -99,13 +180,24 @@ export default function BookingStatus() {
       if (!seat) return;
 
       const seatId = getSeatId(row, col);
-      if (selectedSeats.includes(seatId)) {
-        setSelectedSeats((prev) => prev.filter((id) => id !== seatId));
-      } else if (seat.status !== SeatStatus.Booked) {
-        setSelectedSeats((prev) => [...prev, seatId]);
+      const isSelected = selectedSeats.includes(seatId);
+      const isAvailable = seat.status === SeatStatus.Available;
+
+      if (isSelected) {
+        socket?.emit("releaseSeat", {
+          showId,
+          x: col,
+          y: row,
+        });
+      } else if (isAvailable) {
+        socket?.emit("selectSeat", {
+          showId,
+          x: col,
+          y: row,
+        });
       }
     },
-    [seatMap, selectedSeats]
+    [showId, seatMap, selectedSeats]
   );
 
   const totalPrice = useMemo(() => {
@@ -131,7 +223,9 @@ export default function BookingStatus() {
   }) => {
     const seatId = getSeatId(row, col);
     const isSelected = selectedSeats.includes(seatId);
-    const isBooked = seat.status === SeatStatus.Booked;
+    const isAvailable = seat.status === SeatStatus.Available;
+    const isBooked =
+      seat.status === SeatStatus.Booked || !(isSelected || isAvailable);
 
     const baseStyle: React.CSSProperties = {
       width: "35px",
@@ -143,9 +237,9 @@ export default function BookingStatus() {
         : isSelected
         ? "#198754"
         : seat.color || "#ccc",
-      color: isBooked && !isSelected ? "white" : "white",
-      cursor: isBooked && !isSelected ? "not-allowed" : "pointer",
-      pointerEvents: isBooked && !isSelected ? "none" : "auto",
+      color: "white",
+      cursor: isBooked ? "not-allowed" : "pointer",
+      pointerEvents: isBooked ? "none" : "auto",
     };
 
     return (
@@ -153,7 +247,7 @@ export default function BookingStatus() {
         key={`${row}-${col}-${seat.status}`}
         className="d-flex align-items-center justify-content-center border rounded me-1 mb-1 position-relative"
         style={baseStyle}
-        title={isBooked ? "Booked" : isSelected ? "Selected" : "Available"}
+        title={isSelected ? "Selected" : isAvailable ? "Available" : "Booked"}
         onClick={() => toggleSeat(row, col)}
       >
         {seatId}
