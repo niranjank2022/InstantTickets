@@ -1,23 +1,18 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface IBooking extends Document {
-  userId: string;
+  email: string;
   showId: string;
-  venueId: string;
   bookingTime: Date;
   bookedSeats: string[];
 }
 
 const bookingSchema = new Schema<IBooking>({
-  userId: {
+  email: {
     type: String,
     required: true,
   },
   showId: {
-    type: String,
-    required: true,
-  },
-  venueId: {
     type: String,
     required: true,
   },

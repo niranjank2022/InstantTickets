@@ -95,6 +95,7 @@ export default function BookingStatus() {
           });
         }
         sessionStorage.removeItem(`selectedSeats_${showId}`);
+        socket.disconnect();
       }
 
       // Always clean up these flags

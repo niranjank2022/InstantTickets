@@ -1,6 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { socket } from "../services/socket";
+import UserApis from "../services/user.api";
+import axios from "axios";
 
 // Payment session duration: 3 minutes
 const PAYMENT_SESSION_DURATION = 3 * 60 * 1000;
@@ -51,6 +53,7 @@ export default function PaymentPage() {
 
         // Redirect or close the page
         alert("Payment session expired!");
+        socket.disconnect();
         navigate(-2);
       }
     }, 1000);
@@ -75,12 +78,8 @@ export default function PaymentPage() {
   };
 
   // Book selected seats when upon successful payment
-  const bookSeats = () => {
-    selectedSeats.forEach((seatId: string) => {
-      const row = seatId.charCodeAt(0) - 65;
-      const col = parseInt(seatId.slice(1)) - 1;
-      socket.emit("confirmSeat", { showId, x: col, y: row });
-    });
+  const bookSeats = async () => {
+    await UserApis.createBooking(email, showId, selectedSeats);
     sessionStorage.removeItem(`selectedSeats_${showId}`);
     sessionStorage.removeItem("paymentStart");
     sessionStorage.removeItem("selectedSeats");
@@ -88,10 +87,11 @@ export default function PaymentPage() {
 
   const handleCancel = () => {
     releaseSeats();
+    socket.disconnect();
     navigate(-2);
   };
 
-  const handlePay = () => {
+  const handlePay = async () => {
     // Validate email and phone
     if (!email || !phone) {
       alert("Please fill in both email and phone number.");
@@ -108,15 +108,20 @@ export default function PaymentPage() {
     }
 
     setPhoneError(""); // Clear error if phone is valid
-
-    alert(`Payment initiated for ₹${totalPrice}`);
-
-    // Payment successful
-    sessionStorage.removeItem(`selectedSeats_${showId}`);
-    bookSeats();
-
-    alert("Payment successful! Thank you for your purchase.");
-    navigate("/explore");
+    try {
+      alert(`Payment initiated for ₹${totalPrice}`);
+      sessionStorage.removeItem(`selectedSeats_${showId}`);
+      await bookSeats();
+      alert("Payment successful! Thank you for your purchase.");
+      socket.disconnect();
+      navigate("/explore");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data?.message || "Failed to book seats");
+      } else {
+        alert("Failed to book seats");
+      }
+    }
   };
 
   return (
