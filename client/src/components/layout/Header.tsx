@@ -1,6 +1,7 @@
 import SearchBar from "./SearchBar";
 import CityDropdown from "./CityDropdown";
 import UserProfile from "./UserProfile";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   return (
@@ -10,7 +11,9 @@ export default function Header() {
           <div className="col-9 d-flex justify-content-start">
             <div className="d-flex align-items-center w-100">
               <div className="col-3">
-                <span className="lobster-regular fs-3">Instant⚡Tickets</span>
+                <Link to="/explore" className="text-decoration-none text-dark">
+                  <span className="lobster-regular fs-3">Instant⚡Tickets</span>
+                </Link>
               </div>
               <div className="col-9">
                 <SearchBar />
