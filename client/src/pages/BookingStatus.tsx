@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AdminApis from "../services/theatreAdmin.api";
 import { SeatStatus, SocketStatus } from "../config/config";
 import { socket } from "../services/socket";
@@ -33,7 +33,9 @@ const getSeatId = (row: number, col: number) =>
 
 export default function BookingStatus() {
   const location = useLocation();
-  const { showId, title } = location.state;
+  const navigate = useNavigate();
+  const { show, title } = location.state;
+  const { showId, startTime, endTime, format, language } = show;
   const [seatMap, setSeatmap] = useState<(ISeat | null)[][]>([]);
   const [label, setLabel] = useState<ILabel>({});
   const [selectedSeats, setSelectedSeats] = useState<string[]>(() => {
@@ -63,7 +65,10 @@ export default function BookingStatus() {
       }
     };
 
-    // Always fetch seat map on mount
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem("reloaded", "true");
+    };
+
     fetchSeatMap();
 
     // Handle first-time load vs refresh
@@ -73,17 +78,13 @@ export default function BookingStatus() {
       socket.connect(); // Only connect socket on first load
     }
 
-    // Mark if it's a refresh
-    const handleBeforeUnload = () => {
-      sessionStorage.setItem("reloaded", "true");
-    };
-
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
       const reloaded = sessionStorage.getItem("reloaded");
-      if (!reloaded) {
-        // Only clear and release seats on route change
+      const proceedingToPayment = sessionStorage.getItem("proceedingToPayment");
+
+      if (!reloaded && proceedingToPayment !== "true") {
+        // Only release seats if not navigating to payment
         for (const seatId of selectedSeatsRef.current) {
           const row = seatId.charCodeAt(0) - 65;
           const col = parseInt(seatId.slice(1)) - 1;
@@ -94,13 +95,15 @@ export default function BookingStatus() {
           });
         }
         sessionStorage.removeItem(`selectedSeats_${showId}`);
-      } else {
-        sessionStorage.removeItem("reloaded");
       }
+
+      // Always clean up these flags
+      sessionStorage.removeItem("reloaded");
+      sessionStorage.removeItem("proceedingToPayment");
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [showId]);
 
-  // Initialize socket connection only once
   useEffect(() => {
     const handleSeatUpdate = (data: ISeatUpdate) => {
       const { x, y, seatStatus } = data;
@@ -286,7 +289,24 @@ export default function BookingStatus() {
     <div className="d-flex flex-column min-vh-100">
       <main className="flex-grow-1 container my-4">
         <div className="card shadow p-4">
-          <h2 className="text-center mb-4">{title} Seat Booking Status</h2>
+          <h2 className="text-center mb-4">{title}</h2>
+          <p className="text-muted mb-2" style={{ fontSize: "0.95rem" }}>
+            <span className="me-2">
+              🎬 <strong>{language}</strong> | {format}
+            </span>
+            <span>
+              🕒{" "}
+              {new Date(startTime).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}{" "}
+              –{" "}
+              {new Date(endTime).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </p>
 
           <div className="d-flex justify-content-center mb-4">
             <div
@@ -414,8 +434,15 @@ export default function BookingStatus() {
                 className="btn btn-success"
                 onClick={() => {
                   if (window.confirm("Proceed to book selected seats?")) {
-                    sessionStorage.removeItem(`selectedSeats_${showId}`);
-                    setSelectedSeats([]);
+                    sessionStorage.setItem("proceedingToPayment", "true");
+                    navigate("/payment", {
+                      state: {
+                        showId,
+                        title,
+                        selectedSeats,
+                        totalPrice,
+                      },
+                    });
                   }
                 }}
               >

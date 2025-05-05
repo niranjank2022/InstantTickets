@@ -257,7 +257,9 @@ const ExploreShows: React.FC = () => {
                           ["primary", "success", "info", "warning"][index % 4]
                         } hover-shadow`}
                         onClick={() =>
-                          navigate(`/show/${show.showId}/book-seat`, {state: show})
+                          navigate(`/show/${show.showId}/book-seat`, {
+                            state: { show, title: movie.title },
+                          })
                         }
                       >
                         {new Date(show.startTime).toLocaleTimeString([], {

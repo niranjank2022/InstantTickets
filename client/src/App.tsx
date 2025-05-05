@@ -15,6 +15,7 @@ import SeatStatus from "./pages/SeatStatus";
 import MovieDetails from "./pages/MovieDetails";
 import ExploreShows from "./pages/ExploreShows";
 import BookingStatus from "./pages/BookingStatus";
+import Payment from "./pages/Payment";
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const userContext = useContext(UserContext);
@@ -124,6 +125,7 @@ function App() {
         />
         {/* BookingStatus without Header/Footer */}
         <Route element={<BookingStatus />} path="/show/:showId/book-seat" />
+        <Route element={<Payment />} path="/payment" />
       </Routes>
     </Router>
   );
