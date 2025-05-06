@@ -99,6 +99,7 @@ const AddShow: React.FC = () => {
       alert("Show added successfully!");
       navigate(`/admin/dashboard/${venueId}/shows`, {
         state: { venueName, city },
+        replace: true,
       });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
@@ -116,7 +117,7 @@ const AddShow: React.FC = () => {
       <main className="flex-grow-1 container mt-4">
         <div className="card shadow">
           <div className="card-header bg-primary text-white">
-            <h3 className="mb-0">Add Show in {city}</h3>
+            <h3 className="mb-0">Add Show in {venueName}</h3>
           </div>
           <div className="card-body">
             {isLoading ? (

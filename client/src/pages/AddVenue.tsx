@@ -6,6 +6,7 @@ import SeatLayout from "../components/ui/SeatLayout";
 import SectionsPanel from "../components/ui/SectionsPanel";
 import SectionModal from "../components/form/SectionModal";
 import AdminApis from "../services/theatreAdmin.api";
+import { ALL_CITIES } from "../config/config";
 
 export interface FormData {
   name: string;
@@ -27,15 +28,6 @@ export interface ISection {
 }
 
 const MAX_ROW_COL = 18;
-const CITIES = [
-  "Chennai",
-  "Bangalore",
-  "Mumbai",
-  "New Delhi",
-  "Hyderabad",
-  "Kolkata",
-  "Kochi",
-];
 
 const AddVenueWithSectionsModal: React.FC = () => {
   const navigate = useNavigate();
@@ -56,7 +48,7 @@ const AddVenueWithSectionsModal: React.FC = () => {
     try {
       const res = await AdminApis.addVenue({ ...formData, sections });
       alert(res.data.message);
-      navigate("/admin/dashboard/venues/");
+      navigate("/admin/dashboard/venues/", { replace: true });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
         alert(err.response.data.message);
@@ -80,7 +72,7 @@ const AddVenueWithSectionsModal: React.FC = () => {
             formData={formData}
             setFormData={setFormData}
             maxRowCol={MAX_ROW_COL}
-            cities={CITIES}
+            cities={ALL_CITIES}
           />
         </div>
         <div className="row">
@@ -92,7 +84,16 @@ const AddVenueWithSectionsModal: React.FC = () => {
           />
           <SeatLayout formData={formData} sections={sections} />
         </div>
-        <div className="d-flex justify-content-end mt-4">
+        <div className="d-flex justify-content-end mt-4 gap-2">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() =>
+              navigate("/admin/dashboard/venues/", { replace: true })
+            }
+          >
+            Cancel
+          </button>
           <button
             type="button"
             className="btn btn-primary"

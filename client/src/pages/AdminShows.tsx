@@ -36,10 +36,19 @@ export default function AdminShows() {
   return (
     <>
       <div className="container">
-        <div className="d-flex justify-content-between mb-3">
-          <h3>
-            {venueName}, {city}
-          </h3>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div className="d-flex align-items-center gap-3">
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => navigate(-1)}
+            >
+              ← Back
+            </button>
+            <h3 className="mb-0">
+              {venueName}, {city}
+            </h3>
+          </div>
+
           <button
             className="btn btn-primary"
             onClick={() =>

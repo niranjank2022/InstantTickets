@@ -42,7 +42,6 @@ const ExploreShows: React.FC = () => {
           city
         );
         const data = res.shows;
-        console.log("API response:", data);
 
         // Parse dates
         const parsedData = Object.keys(data).reduce((acc, venue: string) => {

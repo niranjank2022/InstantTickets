@@ -148,11 +148,9 @@ export default function BookingStatus() {
 
     socket.on("connect", () => {
       setIsConnected(true);
-      console.log("Socket connected");
     });
     socket.on("disconnect", () => {
       setIsConnected(false);
-      console.log("Socket disconnected");
     });
 
     socket.on("seatUpdate", (data) => {

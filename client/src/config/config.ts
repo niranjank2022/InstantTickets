@@ -10,6 +10,7 @@ export const ALL_LANGUAGES = [
 export const ALL_FORMATS = ["3D", "Blu-ray", "Digital", "4K"];
 
 export const ALL_GENRES = [
+  "Action",
   "Adventure",
   "Animation",
   "Comedy",

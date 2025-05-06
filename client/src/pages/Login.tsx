@@ -67,13 +67,13 @@ export default function Login() {
       alert(res.message);
       if (signinFields.role === Roles.TheatreAdmin) {
         setRole(Roles.TheatreAdmin);
-        navigate("/admin/dashboard/venues");
+        navigate("/admin/dashboard/venues", { replace: true });
       } else if (signinFields.role === Roles.MovieAdmin) {
         setRole(Roles.MovieAdmin);
-        navigate("/admin/dashboard/movies");
+        navigate("/admin/dashboard/movies", { replace: true });
       } else {
         setRole(Roles.User);
-        navigate("/explore");
+        navigate("/explore", { replace: true });
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -114,13 +114,13 @@ export default function Login() {
 
       if (signupFields.role === Roles.TheatreAdmin) {
         setRole(Roles.TheatreAdmin);
-        navigate("/admin/dashboard/venues/");
+        navigate("/admin/dashboard/venues/", { replace: true });
       } else if (signupFields.role === Roles.MovieAdmin) {
         setRole(Roles.MovieAdmin);
-        navigate("/admin/dashboard/movies/");
+        navigate("/admin/dashboard/movies/", { replace: true });
       } else {
         setRole(Roles.User);
-        navigate("/explore");
+        navigate("/explore", { replace: true });
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {

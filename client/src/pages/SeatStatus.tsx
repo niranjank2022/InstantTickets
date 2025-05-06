@@ -102,9 +102,16 @@ const SeatMap: React.FC = () => {
     <div className="d-flex flex-column min-vh-100">
       <main className="flex-grow-1 container my-4">
         <div className="card shadow p-4">
-          <h2 className="text-center mb-4">
-            {show?.title} Seat Booking Status
-          </h2>
+          <div className="position-relative mb-4">
+            <button
+              className="btn btn-outline-secondary position-absolute start-0"
+              onClick={() => window.history.back()}
+            >
+              ← Back
+            </button>
+            <h2 className="text-center">{show?.title} Seat Booking Status</h2>
+          </div>
+
           <div className="d-flex justify-content-center mb-4">
             <div
               className="text-center text-muted"
@@ -191,9 +198,6 @@ const SeatMap: React.FC = () => {
           </div>
         </div>
       </main>
-      <footer className="bg-dark text-white text-center py-3 mt-auto">
-        <p className="mb-0">© {new Date().getFullYear()} Theatre Admin</p>
-      </footer>
     </div>
   );
 };

@@ -18,7 +18,8 @@ export default function UserProfile() {
     try {
       await AuthApis.logout();
       toggleLogged();
-      localStorage.removeItem("logged");
+      localStorage.clear();
+      sessionStorage.clear();
       setIsOpen(false);
       alert("Logged out successfully");
       if (role !== "USER") {
@@ -73,7 +74,7 @@ export default function UserProfile() {
           )}
         </div>
       ) : (
-        <button className="btn btn-primary" onClick={() => toggleLogged()}>
+        <button className="btn btn-primary" onClick={() => navigate("/login")}>
           Log In
         </button>
       )}

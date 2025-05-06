@@ -68,13 +68,11 @@ export default function PaymentPage() {
 
   // Release selected seats when cancelled or expired
   const releaseSeats = () => {
-    console.log("Releasing seats:", selectedSeats);
 
     selectedSeats.forEach((seatId: string) => {
       const row = seatId.charCodeAt(0) - 65;
       const col = parseInt(seatId.slice(1)) - 1;
       socket.emit("releaseSeat", { showId, x: col, y: row });
-      console.log(row, col);
     });
     sessionStorage.removeItem(`selectedSeats_${showId}`);
     sessionStorage.removeItem("paymentStart");
