@@ -108,6 +108,8 @@ export async function releaseSeatController(socket: Socket, data: { showId: stri
       y: y,
       x: x,
     });
+    console.log(data);
+    
     getIo()!.emit('seatUpdate', { ...data, seatStatus: seat.status });
   } catch (error) {
     if (error instanceof Error) {

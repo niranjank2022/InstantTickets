@@ -32,4 +32,21 @@ export const BookingController = {
       });
     }
   },
+
+  getTicketByBookingId: async (req: Request, res: Response) => {
+    try {
+      const bookingId = req.params.bookingId;
+      const ticket = await BookingService.getTicketByBookingId(bookingId);
+      if (!ticket) {
+        res.status(404).json({ message: 'Ticket not found' });
+        return;
+      }
+      res.status(200).json(ticket);
+    } catch (error) {
+      res.status(500).json({
+        message: messages.SERVER_ERROR,
+        error,
+      });
+    }
+  },
 };

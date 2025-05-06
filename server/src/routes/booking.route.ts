@@ -5,5 +5,6 @@ import { CreateBookingDto } from '../dto/CreateBooking.dto';
 
 const router = Router();
 router.post('/', validateRequest(CreateBookingDto), BookingController.createBooking);
+router.get('/:bookingId', BookingController.getTicketByBookingId);
 
 export default router;
