@@ -1,7 +1,12 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { useContext } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import React, { useContext } from "react";
 
-import AdminLogin from "./pages/Login";
+import Login from "./pages/Login";
 import AdminVenues from "./pages/AdminVenues";
 import UserContext from "./contexts/UserContext";
 import Header from "./components/layout/Header";
@@ -17,21 +22,33 @@ import ExploreShows from "./pages/ExploreShows";
 import BookingStatus from "./pages/BookingStatus";
 import Payment from "./pages/Payment";
 
-const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+function RouteLayout({
+  children,
+  isProtected,
+  isMain,
+}: {
+  children: React.ReactNode;
+  isProtected: boolean;
+  isMain: boolean;
+}) {
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error("Error: MainLayout must be used within a UserProvider!");
   }
+
   const { logged } = userContext;
+  if (isProtected && !logged) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      {logged && <Header />}
+      {isMain && <Header />}
       <main className="flex-fill">{children}</main>
-      {logged && <Footer />}
+      {isMain && <Footer />}
     </div>
   );
-};
+}
 
 function App() {
   const userContext = useContext(UserContext);
@@ -45,87 +62,100 @@ function App() {
         {/* Routes with Header and Footer */}
         <Route
           element={
-            <MainLayout>
-              <AdminLogin />
-            </MainLayout>
+            <RouteLayout isProtected={false} isMain={false}>
+              <Login />
+            </RouteLayout>
           }
           path="/login"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={true} isMain={true}>
               <AdminVenues />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/admin/dashboard/venues"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={true} isMain={true}>
               <AdminShows />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/admin/dashboard/:venueId/shows/"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={true} isMain={true}>
               <SeatStatus />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/admin/:showId/seat-status"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={true} isMain={true}>
               <AddVenue />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/admin/add-venue"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={true} isMain={true}>
               <AddShow />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/admin/add-show"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={true} isMain={true}>
               <AdminMovies />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/admin/dashboard/movies"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={false} isMain={true}>
               <ExploreHome />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/explore"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={false} isMain={true}>
               <MovieDetails />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/:city/movies/:movie/:movieId"
         />
         <Route
           element={
-            <MainLayout>
+            <RouteLayout isProtected={false} isMain={true}>
               <ExploreShows />
-            </MainLayout>
+            </RouteLayout>
           }
           path="/explore/:city/:movie/:movieId/shows"
         />
-        {/* BookingStatus without Header/Footer */}
-        <Route element={<BookingStatus />} path="/show/:showId/book-seat" />
-        <Route element={<Payment />} path="/payment" />
+        <Route
+          element={
+            <RouteLayout isProtected={false} isMain={false}>
+              <BookingStatus />
+            </RouteLayout>
+          }
+          path="/show/:showId/book-seat"
+        />
+        <Route
+          element={
+            <RouteLayout isProtected={false} isMain={true}>
+              <Payment />
+            </RouteLayout>
+          }
+          path="/payment"
+        />
       </Routes>
     </Router>
   );

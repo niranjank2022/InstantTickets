@@ -13,7 +13,7 @@ export default function UserProfile() {
     throw new Error("Error: UserProfile must be used within a UserProvider!");
   }
 
-  const { logged, toggleLogged, username } = userContext;
+  const { logged, toggleLogged, username, role } = userContext;
   const handleLogout = async () => {
     try {
       await AuthApis.logout();
@@ -21,7 +21,9 @@ export default function UserProfile() {
       localStorage.removeItem("logged");
       setIsOpen(false);
       alert("Logged out successfully");
-      navigate("/login");
+      if (role !== "USER") {
+        navigate("/login");
+      }
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
         alert(err.response.data.message);

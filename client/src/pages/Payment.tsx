@@ -9,7 +9,8 @@ const PAYMENT_SESSION_DURATION = 3 * 60 * 1000;
 
 export default function PaymentPage() {
   const navigate = useNavigate();
-  const { showId, title, selectedSeats, totalPrice } = useLocation().state;
+  const { state } = useLocation();
+  const { showId, title, selectedSeats, totalPrice } = state || {};
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");

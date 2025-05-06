@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useState } from "react";
+import { Roles } from "../services/auth.api";
 
 interface IUserContext {
   city: string;
@@ -6,6 +7,8 @@ interface IUserContext {
   logged: boolean;
   changeCity: (newCity: string) => void;
   username: string;
+  role: string;
+  setRole: (newRole: Roles) => void;
 }
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -28,10 +31,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   const username = "Guest";
+  const storedRole = (localStorage.getItem("role") as Roles) || Roles;
+  const [role, setRole] = useState<Roles>(storedRole);
 
   return (
     <UserContext.Provider
-      value={{ city, changeCity, logged, toggleLogged, username }}
+      value={{
+        city,
+        changeCity,
+        logged,
+        toggleLogged,
+        username,
+        role,
+        setRole,
+      }}
     >
       {children}
     </UserContext.Provider>

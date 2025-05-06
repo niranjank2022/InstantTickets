@@ -11,14 +11,14 @@ interface IFormFields {
   role: Roles;
 }
 
-export default function AdminLogin() {
+export default function Login() {
   const navigate = useNavigate();
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error("Error: UserProfile must be used within UserProvider");
   }
 
-  const { logged, toggleLogged } = userContext;
+  const { logged, toggleLogged, setRole } = userContext;
   const [signinFields, setAdminSigninFields] = useState<IFormFields>({
     email: "",
     password: "",
@@ -66,10 +66,13 @@ export default function AdminLogin() {
       if (!logged) toggleLogged();
       alert(res.message);
       if (signinFields.role === Roles.TheatreAdmin) {
+        setRole(Roles.TheatreAdmin);
         navigate("/admin/dashboard/venues");
       } else if (signinFields.role === Roles.MovieAdmin) {
+        setRole(Roles.MovieAdmin);
         navigate("/admin/dashboard/movies");
       } else {
+        setRole(Roles.User);
         navigate("/explore");
       }
     } catch (error) {
@@ -110,10 +113,13 @@ export default function AdminLogin() {
       alert(res.message);
 
       if (signupFields.role === Roles.TheatreAdmin) {
+        setRole(Roles.TheatreAdmin);
         navigate("/admin/dashboard/venues/");
       } else if (signupFields.role === Roles.MovieAdmin) {
+        setRole(Roles.MovieAdmin);
         navigate("/admin/dashboard/movies/");
       } else {
+        setRole(Roles.User);
         navigate("/explore");
       }
     } catch (error) {
