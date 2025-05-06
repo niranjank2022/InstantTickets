@@ -60,6 +60,8 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route element={<Navigate to="/explore" replace />} path="/" />
+
         {/* Routes with Header and Footer */}
         <Route
           element={
