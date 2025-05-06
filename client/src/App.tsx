@@ -21,6 +21,7 @@ import MovieDetails from "./pages/MovieDetails";
 import ExploreShows from "./pages/ExploreShows";
 import BookingStatus from "./pages/BookingStatus";
 import Payment from "./pages/Payment";
+import ETicket from "./pages/ETicket";
 
 function RouteLayout({
   children,
@@ -155,6 +156,14 @@ function App() {
             </RouteLayout>
           }
           path="/payment"
+        />
+        <Route
+          element={
+            <RouteLayout isProtected={false} isMain={true}>
+              <ETicket />
+            </RouteLayout>
+          }
+          path="/bookings/:bookingId"
         />
       </Routes>
     </Router>

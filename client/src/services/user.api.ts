@@ -42,6 +42,11 @@ const UserApis = {
     });
     return res.data;
   },
+
+  getTicketByBookingId: async function (bookingId: string) {
+    const res = await api.get(`/bookings/${bookingId}`);
+    return res.data;
+  },
 };
 
 export default UserApis;

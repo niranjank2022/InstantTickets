@@ -68,10 +68,13 @@ export default function PaymentPage() {
 
   // Release selected seats when cancelled or expired
   const releaseSeats = () => {
+    console.log("Releasing seats:", selectedSeats);
+
     selectedSeats.forEach((seatId: string) => {
       const row = seatId.charCodeAt(0) - 65;
       const col = parseInt(seatId.slice(1)) - 1;
       socket.emit("releaseSeat", { showId, x: col, y: row });
+      console.log(row, col);
     });
     sessionStorage.removeItem(`selectedSeats_${showId}`);
     sessionStorage.removeItem("paymentStart");
@@ -80,10 +83,12 @@ export default function PaymentPage() {
 
   // Book selected seats when upon successful payment
   const bookSeats = async () => {
-    await UserApis.createBooking(email, showId, selectedSeats);
+    const res = await UserApis.createBooking(email, showId, selectedSeats);
+    const bookingId = res.bookingId;
     sessionStorage.removeItem(`selectedSeats_${showId}`);
     sessionStorage.removeItem("paymentStart");
     sessionStorage.removeItem("selectedSeats");
+    return bookingId;
   };
 
   const handleCancel = () => {
@@ -112,10 +117,10 @@ export default function PaymentPage() {
     try {
       alert(`Payment initiated for ₹${totalPrice}`);
       sessionStorage.removeItem(`selectedSeats_${showId}`);
-      await bookSeats();
+      const bookingId = await bookSeats();
       alert("Payment successful! Thank you for your purchase.");
       socket.disconnect();
-      navigate("/explore");
+      navigate("/bookings/" + bookingId, { replace: true });
     } catch (error) {
       if (axios.isAxiosError(error)) {
         alert(error.response?.data?.message || "Failed to book seats");
