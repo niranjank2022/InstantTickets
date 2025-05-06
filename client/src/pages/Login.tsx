@@ -18,7 +18,7 @@ export default function Login() {
     throw new Error("Error: UserProfile must be used within UserProvider");
   }
 
-  const { logged, toggleLogged, setRole } = userContext;
+  const { logged, toggleLogged, changeRole } = userContext;
   const [signinFields, setAdminSigninFields] = useState<IFormFields>({
     email: "",
     password: "",
@@ -66,13 +66,13 @@ export default function Login() {
       if (!logged) toggleLogged();
       alert(res.message);
       if (signinFields.role === Roles.TheatreAdmin) {
-        setRole(Roles.TheatreAdmin);
+        changeRole(Roles.TheatreAdmin);
         navigate("/admin/dashboard/venues", { replace: true });
       } else if (signinFields.role === Roles.MovieAdmin) {
-        setRole(Roles.MovieAdmin);
+        changeRole(Roles.MovieAdmin);
         navigate("/admin/dashboard/movies", { replace: true });
       } else {
-        setRole(Roles.User);
+        changeRole(Roles.User);
         navigate("/explore", { replace: true });
       }
     } catch (error) {
@@ -113,13 +113,13 @@ export default function Login() {
       alert(res.message);
 
       if (signupFields.role === Roles.TheatreAdmin) {
-        setRole(Roles.TheatreAdmin);
+        changeRole(Roles.TheatreAdmin);
         navigate("/admin/dashboard/venues/", { replace: true });
       } else if (signupFields.role === Roles.MovieAdmin) {
-        setRole(Roles.MovieAdmin);
+        changeRole(Roles.MovieAdmin);
         navigate("/admin/dashboard/movies/", { replace: true });
       } else {
-        setRole(Roles.User);
+        changeRole(Roles.User);
         navigate("/explore", { replace: true });
       }
     } catch (error) {

@@ -4,13 +4,12 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import React, { useContext } from "react";
+import { useContext } from "react";
 
+import UserContext from "./contexts/UserContext";
+import RouteLayout from "./components/layout/RouteLayout";
 import Login from "./pages/Login";
 import AdminVenues from "./pages/AdminVenues";
-import UserContext from "./contexts/UserContext";
-import Header from "./components/layout/Header";
-import Footer from "./components/layout/Footer";
 import ExploreHome from "./pages/ExploreHome";
 import AddVenue from "./pages/AddVenue";
 import AdminShows from "./pages/AdminShows";
@@ -22,34 +21,8 @@ import ExploreShows from "./pages/ExploreShows";
 import BookingStatus from "./pages/BookingStatus";
 import Payment from "./pages/Payment";
 import ETicket from "./pages/ETicket";
-
-function RouteLayout({
-  children,
-  isProtected,
-  isMain,
-}: {
-  children: React.ReactNode;
-  isProtected: boolean;
-  isMain: boolean;
-}) {
-  const userContext = useContext(UserContext);
-  if (!userContext) {
-    throw new Error("Error: MainLayout must be used within a UserProvider!");
-  }
-
-  const { logged } = userContext;
-  if (isProtected && !logged) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return (
-    <div className="d-flex flex-column min-vh-100">
-      {isMain && <Header />}
-      <main className="flex-fill">{children}</main>
-      {isMain && <Footer />}
-    </div>
-  );
-}
+import { Roles } from "./services/auth.api";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const userContext = useContext(UserContext);
@@ -57,15 +30,30 @@ function App() {
     throw new Error("Error: App must be used within a UserProvider!");
   }
 
+  const { role } = userContext;
   return (
     <Router>
       <Routes>
-        <Route element={<Navigate to="/explore" replace />} path="/" />
+        <Route
+          element={
+            <Navigate
+              to={
+                role === Roles.User
+                  ? "/explore"
+                  : role === Roles.TheatreAdmin
+                  ? "/admin/dashboard/venues"
+                  : "/admin/dashboard/movies"
+              }
+              replace
+            />
+          }
+          path="/"
+        />
 
         {/* Routes with Header and Footer */}
         <Route
           element={
-            <RouteLayout isProtected={false} isMain={false}>
+            <RouteLayout isMain={false}>
               <Login />
             </RouteLayout>
           }
@@ -73,7 +61,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={true} isMain={true}>
+            <RouteLayout allowedRole={Roles.TheatreAdmin} isMain={true}>
               <AdminVenues />
             </RouteLayout>
           }
@@ -81,7 +69,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={true} isMain={true}>
+            <RouteLayout allowedRole={Roles.TheatreAdmin} isMain={true}>
               <AdminShows />
             </RouteLayout>
           }
@@ -89,7 +77,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={true} isMain={true}>
+            <RouteLayout allowedRole={Roles.TheatreAdmin} isMain={true}>
               <SeatStatus />
             </RouteLayout>
           }
@@ -97,7 +85,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={true} isMain={true}>
+            <RouteLayout allowedRole={Roles.TheatreAdmin} isMain={true}>
               <AddVenue />
             </RouteLayout>
           }
@@ -105,7 +93,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={true} isMain={true}>
+            <RouteLayout allowedRole={Roles.TheatreAdmin} isMain={true}>
               <AddShow />
             </RouteLayout>
           }
@@ -113,7 +101,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={true} isMain={true}>
+            <RouteLayout allowedRole={Roles.MovieAdmin} isMain={true}>
               <AdminMovies />
             </RouteLayout>
           }
@@ -121,7 +109,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={false} isMain={true}>
+            <RouteLayout allowedRole={Roles.User} isMain={true}>
               <ExploreHome />
             </RouteLayout>
           }
@@ -129,7 +117,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={false} isMain={true}>
+            <RouteLayout allowedRole={Roles.User} isMain={true}>
               <MovieDetails />
             </RouteLayout>
           }
@@ -137,7 +125,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={false} isMain={true}>
+            <RouteLayout allowedRole={Roles.User} isMain={true}>
               <ExploreShows />
             </RouteLayout>
           }
@@ -145,7 +133,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={false} isMain={false}>
+            <RouteLayout allowedRole={Roles.User} isMain={false}>
               <BookingStatus />
             </RouteLayout>
           }
@@ -153,7 +141,7 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={false} isMain={true}>
+            <RouteLayout allowedRole={Roles.User} isMain={true}>
               <Payment />
             </RouteLayout>
           }
@@ -161,12 +149,13 @@ function App() {
         />
         <Route
           element={
-            <RouteLayout isProtected={false} isMain={true}>
+            <RouteLayout allowedRole={Roles.User} isMain={true}>
               <ETicket />
             </RouteLayout>
           }
           path="/bookings/:bookingId"
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

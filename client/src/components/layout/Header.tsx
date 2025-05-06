@@ -21,28 +21,17 @@ export default function Header() {
           <div className="col-9 d-flex justify-content-start">
             <div className="d-flex align-items-center w-100">
               <div className="col-3">
-                <Link
-                  to={
-                    role === Roles.User
-                      ? "/explore"
-                      : role === Roles.TheatreAdmin
-                      ? "/admin/dashboard/venues"
-                      : "/admin/dashboard/movies"
-                  }
-                  className="text-decoration-none text-dark"
-                >
+                <Link to="/" className="text-decoration-none text-dark">
                   <span className="lobster-regular fs-3">Instant⚡Tickets</span>
                 </Link>
               </div>
-              <div className="col-9">
-                <SearchBar />
-              </div>
+              <div className="col-9">{role == Roles.User && <SearchBar />}</div>
             </div>
           </div>
           <div className="col-3">
             <div className="row align-items-center">
               <div className="col-6">
-                <CityDropdown />
+                {role === Roles.User && <CityDropdown />}
               </div>
               <div className="col-6">
                 <UserProfile />
