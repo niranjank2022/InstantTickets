@@ -21,7 +21,7 @@ export default function ETicketPage() {
   useEffect(() => {
     const fetchTicket = async () => {
       const res = await UserApis.getTicketByBookingId(bookingId!);
-      setTicket(res);
+      setTicket(res.ticket);
     };
     fetchTicket();
   }, [bookingId]);

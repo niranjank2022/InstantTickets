@@ -12,6 +12,15 @@ export const BookingRepository = {
     }
   },
 
+  find: async (filter: FilterQuery<IBooking>) => {
+    try {
+      return await Booking.find(filter);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
+      throw new Error(messages.booking.FIND_ERROR + errorMessage);
+    }
+  },
+
   create: async (booking: Partial<IBooking>) => {
     try {
       return await Booking.create(booking);

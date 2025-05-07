@@ -23,6 +23,7 @@ import Payment from "./pages/Payment";
 import ETicket from "./pages/ETicket";
 import { Roles } from "./services/auth.api";
 import NotFound from "./pages/NotFound";
+import ViewTickets from "./pages/ViewTickets";
 
 function App() {
   const userContext = useContext(UserContext);
@@ -154,6 +155,14 @@ function App() {
             </RouteLayout>
           }
           path="/bookings/:bookingId"
+        />
+        <Route
+          element={
+            <RouteLayout allowedRole={Roles.User} isMain={true}>
+              <ViewTickets />
+            </RouteLayout>
+          }
+          path="/view-tickets"
         />
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -62,4 +62,41 @@ export const BookingService = {
       throw new Error(messages.booking.FIND_ERROR + errorMessage);
     }
   },
+
+  getAllTicketsByEmail: async (email: string) => {
+    try {
+      const bookings = await BookingRepository.find({ email: email });
+      if (!bookings) {
+        throw new Error('No tickets found for this email');
+      }
+
+      const tickets = await Promise.all(
+        bookings.map(async booking => {
+          const show = await ShowService.getShowById(booking.showId);
+          if (!show) {
+            throw new Error('Show not found');
+          }
+
+          const venue = await VenueService.getVenueById(show.venueId);
+          if (!venue) {
+            throw new Error('Venue not found');
+          }
+
+          return {
+            bookingId: booking.id,
+            title: show.movieTitle,
+            venue: venue.name,
+            seats: booking.bookedSeats,
+            showTime: show.startTime,
+            bookingTime: booking.bookingTime,
+          };
+        })
+      );
+
+      return tickets;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : messages.UNKNOWN_ERROR;
+      throw new Error(messages.booking.FIND_ERROR + errorMessage);
+    }
+  },
 };

@@ -67,6 +67,13 @@ export default function UserProfile() {
             >
               <p className="m-0 text-center">Hi, {username}!</p>
               <hr className="my-2" />
+              <button
+                className="btn btn-primary w-100"
+                onClick={() => navigate("/view-tickets")}
+              >
+                View Tickets
+              </button>
+              <hr className="my-2" />
               <button className="btn btn-danger w-100" onClick={handleLogout}>
                 Log Out
               </button>

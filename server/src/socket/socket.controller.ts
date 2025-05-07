@@ -65,7 +65,6 @@ export async function releaseSeatController(socket: Socket, data: { showId: stri
   try {
     const { showId, x, y } = data;
     const show = await ShowService.getShowById(showId);
-    console.log(data);
     if (!show) {
       console.error(messages.RECORD_NOT_FOUND);
       return socket.emit('seatResponse', {
@@ -109,8 +108,6 @@ export async function releaseSeatController(socket: Socket, data: { showId: stri
       y: y,
       x: x,
     });
-    console.log(data);
-
     getIo()!.emit('seatUpdate', { ...data, seatStatus: seat.status });
   } catch (error) {
     if (error instanceof Error) {
