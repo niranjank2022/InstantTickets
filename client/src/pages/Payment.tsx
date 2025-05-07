@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { socket } from "../services/socket";
 import UserApis from "../services/user.api";
 import axios from "axios";
 
@@ -19,7 +18,8 @@ export default function PaymentPage() {
   useEffect(() => {
     // Redirect if accessed directly
     if (!showId || !selectedSeats?.length) {
-      navigate("/explore");
+      navigate("/explore", { replace: true });
+      return;
     }
   }, [showId, selectedSeats, navigate]);
 
@@ -39,7 +39,7 @@ export default function PaymentPage() {
     if (remaining <= 0) {
       alert("Payment session expired!");
       sessionStorage.removeItem("paymentStart");
-      navigate(-2); // Close the page or redirect
+      navigate(-2);
       return;
     }
 
@@ -54,7 +54,6 @@ export default function PaymentPage() {
 
         // Redirect or close the page
         alert("Payment session expired!");
-        socket.disconnect();
         navigate(-2);
       }
     }, 1000);
@@ -66,32 +65,16 @@ export default function PaymentPage() {
   const minutes = Math.floor(timeLeft / 60000);
   const seconds = Math.floor((timeLeft % 60000) / 1000);
 
-  // Release selected seats when cancelled or expired
-  const releaseSeats = () => {
-
-    selectedSeats.forEach((seatId: string) => {
-      const row = seatId.charCodeAt(0) - 65;
-      const col = parseInt(seatId.slice(1)) - 1;
-      socket.emit("releaseSeat", { showId, x: col, y: row });
-    });
-    sessionStorage.removeItem(`selectedSeats_${showId}`);
-    sessionStorage.removeItem("paymentStart");
-    sessionStorage.removeItem("selectedSeats");
-  };
-
   // Book selected seats when upon successful payment
   const bookSeats = async () => {
     const res = await UserApis.createBooking(email, showId, selectedSeats);
     const bookingId = res.bookingId;
-    sessionStorage.removeItem(`selectedSeats_${showId}`);
-    sessionStorage.removeItem("paymentStart");
-    sessionStorage.removeItem("selectedSeats");
+    sessionStorage.clear();
     return bookingId;
   };
 
   const handleCancel = () => {
-    releaseSeats();
-    socket.disconnect();
+    sessionStorage.clear();
     navigate(-2);
   };
 
@@ -117,7 +100,6 @@ export default function PaymentPage() {
       sessionStorage.removeItem(`selectedSeats_${showId}`);
       const bookingId = await bookSeats();
       alert("Payment successful! Thank you for your purchase.");
-      socket.disconnect();
       navigate("/bookings/" + bookingId, { replace: true });
     } catch (error) {
       if (axios.isAxiosError(error)) {

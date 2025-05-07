@@ -84,21 +84,11 @@ export default function BookingStatus() {
       const proceedingToPayment = sessionStorage.getItem("proceedingToPayment");
 
       if (!reloaded && proceedingToPayment !== "true") {
-        // Only release seats if not navigating to payment
-        for (const seatId of selectedSeatsRef.current) {
-          const row = seatId.charCodeAt(0) - 65;
-          const col = parseInt(seatId.slice(1)) - 1;
-          socket?.emit("releaseSeat", {
-            showId,
-            x: col,
-            y: row,
-          });
-        }
-        sessionStorage.removeItem(`selectedSeats_${showId}`);
         socket.disconnect();
       }
 
       // Always clean up these flags
+      sessionStorage.removeItem(`selectedSeats_${showId}`);
       sessionStorage.removeItem("reloaded");
       sessionStorage.removeItem("proceedingToPayment");
       window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -441,6 +431,7 @@ export default function BookingStatus() {
                         selectedSeats,
                         totalPrice,
                       },
+                      replace: true,
                     });
                   }
                 }}
