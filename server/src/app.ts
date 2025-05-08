@@ -12,10 +12,12 @@ import { messages } from './config/logger';
 // Create the express app
 const app: Application = express();
 
+const allowedOrigins = ['http://localhost:5173', 'https://instanttickets.onrender.com'];
+
 // Add middlewares before routes
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
   })
 );
