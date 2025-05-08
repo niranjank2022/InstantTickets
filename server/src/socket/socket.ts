@@ -1,7 +1,7 @@
 import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
 import { messages } from '../config/logger';
-import { selectSeatController, releaseSeatController, confirmSeatController } from './socket.controller';
+import { selectSeatController, releaseSeatController } from './socket.controller';
 
 let io: Server | null = null;
 
@@ -17,7 +17,6 @@ export function initializeSocket(server: HttpServer) {
     console.log(messages.CLIENT_CONNECTED(socket.id));
     socket.on('selectSeat', data => selectSeatController(socket, data));
     socket.on('releaseSeat', data => releaseSeatController(socket, data));
-    socket.on('confirmSeat', data => confirmSeatController(socket, data));
     socket.on('disconnect', () => console.log(messages.CLIENT_DISCONNECTED(socket.id)));
   });
 
