@@ -37,21 +37,24 @@ const ExploreShows: React.FC = () => {
 
       try {
         setLoading(true);
-        const res: ShowsByVenue = await UserApis.getShowsByMovieIdAndCity(
+        const res = await UserApis.getShowsByMovieIdAndCity(
           movie.movieId,
           city
         );
-        const data = res.shows;
+        const data: ShowsByVenue = res.shows;
 
         // Parse dates
-        const parsedData = Object.keys(data).reduce((acc, venue: string) => {
-          acc[venue] = data[venue].map((show) => ({
-            ...show,
-            startTime: new Date(show.startTime),
-            endTime: new Date(show.endTime),
-          }));
-          return acc;
-        }, {} as ShowsByVenue);
+        const parsedData = Object.keys(data).reduce(
+          (acc: ShowsByVenue, venue: string) => {
+            acc[venue] = data[venue].map((show: IShow) => ({
+              ...show,
+              startTime: new Date(show.startTime),
+              endTime: new Date(show.endTime),
+            }));
+            return acc;
+          },
+          {} as ShowsByVenue
+        );
         setShowsByVenue(parsedData);
         setFilteredShows(parsedData);
       } catch (error) {
