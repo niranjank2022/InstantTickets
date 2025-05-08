@@ -7,8 +7,7 @@ export const messages = Object.freeze({
   MONGODB_CONNECTION_FAILURE: 'Error: MongoDB connection failure',
   SERVER_RUNNING: `Server is running on port ${config.PORT}`,
   ROUTE_NOT_FOUND: "Error: Sorry, that route doesn't exist.",
-  
-  
+
   RECORD_NOT_FOUND: 'Error: No records were found.',
   SERVER_ERROR: 'Error: Some error happened while processing the request.',
   CLEARED_RECORDS: (model: string) => `Cleared existing ${model} records.`,
